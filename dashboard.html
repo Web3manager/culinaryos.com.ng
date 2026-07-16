@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>CulinaryOS — Discover Nigerian Heritage Food</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['"Fraunces"','serif'],
+        sans: ['"Manrope"','sans-serif'],
+      },
+      colors: {
+        leaf: { 50:'#f1faf4',100:'#dcf2e3',200:'#b3e2c3',300:'#7fce9d',400:'#4bb877',500:'#1f9d5a',600:'#147a45',700:'#0f5f37',800:'#0c4a2c',900:'#083822'},
+        gold: { 50:'#fffaf0',100:'#fff0d1',200:'#ffdf9e',300:'#ffc966',400:'#ffb238',500:'#f59a12',600:'#d47f08',700:'#a8630a',800:'#7a480a'},
+        clay: { 50:'#fef4f0',100:'#fce3d9',200:'#f8c3ae',300:'#f0987a',400:'#e5714f',500:'#d6542f',600:'#b53f21',700:'#8f321c'},
+        ink: { 50:'#f7f8f7',100:'#e9ebe9',200:'#cfd3d0',300:'#a3aaa4',400:'#707970',500:'#4c554d',600:'#37403a',700:'#292f2a',800:'#1c211d',900:'#121612'},
+      },
+      boxShadow: {
+        card: '0 1px 2px rgba(18,22,18,0.04), 0 8px 24px -12px rgba(18,22,18,0.12)',
+        lift: '0 4px 10px rgba(18,22,18,0.06), 0 20px 40px -16px rgba(18,22,18,0.18)',
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: #FCFBF8;
+    color: #1c211d;
+    overscroll-behavior-y: none;
+  }
+  .font-display { font-family: 'Fraunces', serif; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #cfd3d0; border-radius: 4px; }
+  .view { display: none !important; }
+  .view.active { display: block !important; animation: fadeIn .25s ease; }
+  .view.active.view-flex { display: flex !important; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  .chip { transition: all .15s ease; }
+  .chip.active { background:#0f5f37; color:#fff; border-color:#0f5f37; }
+  .dish-card { transition: transform .15s ease, box-shadow .15s ease; }
+  .dish-card:active { transform: scale(0.97); }
+  .state-card { transition: transform .15s ease; }
+  .state-card:active { transform: scale(0.96); }
+  .golden-ring { box-shadow: 0 0 0 2px #ffb238, 0 4px 14px -6px rgba(245,154,18,0.55); }
+  .drawer { transition: transform .28s cubic-bezier(.4,0,.2,1); }
+  .drawer.closed { transform: translateX(100%); }
+  .scrim { transition: opacity .25s ease; }
+  .modal-sheet { transition: transform .3s cubic-bezier(.4,0,.2,1); }
+  .modal-sheet.closed { transform: translateY(100%); }
+  .stopwatch-ring { transition: stroke-dashoffset 1s linear; }
+  .toast-el { transition: all .3s cubic-bezier(.4,0,.2,1); }
+  .blurscreen { backdrop-filter: blur(14px); }
+  input[type=range].amber::-webkit-slider-thumb { background:#0f5f37; }
+  .no-scrollbar::-webkit-scrollbar{ display:none; }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+  /* ============ DARK THEME OVERRIDES ============ */
+  html.dark body { background:#121612 !important; color:#e9ebe9; }
+  html.dark .bg-\[\#FCFBF8\] { background:#121612 !important; }
+  html.dark header, html.dark aside#drawer, html.dark #drawer-sidebar-desktop { background:#1c211d !important; border-color:#292f2a !important; }
+  html.dark .bg-white { background-color:#1c211d !important; }
+  html.dark .bg-ink-50 { background-color:#232920 !important; }
+  html.dark .bg-ink-100 { background-color:#292f2a !important; }
+  html.dark .border-ink-100 { border-color:#333a34 !important; }
+  html.dark .text-ink-800 { color:#f2f3f1 !important; }
+  html.dark .text-ink-700 { color:#e2e4e1 !important; }
+  html.dark .text-ink-600 { color:#c7cbc7 !important; }
+  html.dark .text-ink-500 { color:#a9aea9 !important; }
+  html.dark .text-ink-400 { color:#8b918c !important; }
+  html.dark .text-ink-300 { color:#6d746e !important; }
+  html.dark .bg-leaf-50 { background-color:#12261c !important; }
+  html.dark .bg-gold-50 { background-color:#2a230f !important; }
+  html.dark .border-leaf-200 { border-color:#1f5c3a !important; }
+  html.dark .border-gold-200 { border-color:#7a5c1a !important; }
+  html.dark .shadow-card, html.dark .shadow-lift { box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important; }
+  html.dark #drawer-scrim, html.dark #compose-scrim { background: rgba(0,0,0,0.6) !important; }
+  html.dark .bg-ink-900\/80 { background-color: rgba(0,0,0,0.85) !important; }
+  .theme-btn, .theme-btn-d { color: #707970; }
+  .theme-btn.active, .theme-btn-d.active { background:#0f5f37; color:#fff; }
+  html.dark .theme-btn.active, html.dark .theme-btn-d.active { background:#4bb877; color:#0c1a12; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============ TOP HEADER ============ -->
+<header class="sticky top-0 z-40 bg-[#FCFBF8]/90 backdrop-blur-md border-b border-ink-100 px-4 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <svg width="38" height="38" viewBox="0 0 38 38" class="shrink-0">
+      <defs>
+        <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#4bb877"/>
+          <stop offset="1" stop-color="#0f5f37"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="38" height="38" rx="10" fill="url(#logoGrad)"/>
+      <!-- fork (right side) -->
+      <g stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <line x1="24" y1="10" x2="15" y2="29"/>
+        <line x1="22.3" y1="10" x2="22.3" y2="14.5"/>
+        <line x1="24" y1="10" x2="24" y2="14.8"/>
+        <line x1="25.7" y1="10" x2="25.7" y2="14.5"/>
+        <path d="M22 14.8 Q24 17 26 14.8"/>
+      </g>
+      <!-- spoon (left side) -->
+      <g stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" fill="none">
+        <line x1="14" y1="15" x2="23" y2="29"/>
+        <ellipse cx="13.3" cy="12.8" rx="3.4" ry="4.4" transform="rotate(-18 13.3 12.8)"/>
+      </g>
+    </svg>
+    <div>
+      <p class="font-display font-bold text-lg leading-none text-ink-800">Culinary<span class="text-leaf-600">OS</span></p>
+      <p class="text-[10px] text-ink-400 font-semibold tracking-wide">Preserving food, one dish at a time</p>
+    </div>
+  </div>
+  <button onclick="openDrawer()" class="md:hidden w-10 h-10 rounded-full bg-white border border-ink-100 shadow-card flex items-center justify-center text-ink-700 active:scale-95 transition-transform">
+    <span class="material-icons">menu</span>
+  </button>
+</header>
+
+<!-- ===================== DESKTOP SIDEBAR (md+ only) ===================== -->
+<aside class="hidden md:flex flex-col fixed left-0 top-[65px] bottom-0 w-60 bg-white border-r border-ink-100 overflow-y-auto z-30 p-3">
+  <p class="px-2 pt-1 pb-1 text-[10px] font-bold text-ink-300 uppercase tracking-widest">Explore</p>
+  <button onclick="goTo('foodmap')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-leaf-600 text-xl">map</span> FoodMap</button>
+  <button onclick="goTo('ingest')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-leaf-600 text-xl">add_circle</span> Ingest Wizard</button>
+  <button onclick="goTo('blog')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-clay-500 text-xl">auto_stories</span> Blog</button>
+  <button onclick="goTo('discover')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-leaf-600 text-xl">search</span> Search</button>
+
+  <p class="px-2 pt-4 pb-1 text-[10px] font-bold text-ink-300 uppercase tracking-widest">Platform</p>
+  <button onclick="goTo('sandbox')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-ink-500 text-xl">data_object</span> Dev Sandbox</button>
+  <button onclick="goTo('simulation')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-ink-500 text-xl">calculate</span> Simulation</button>
+  <button onclick="goTo('cmxp')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-gold-500 text-xl">military_tech</span> cmXP Marketplace</button>
+  <button onclick="goTo('pricing')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-ink-500 text-xl">payments</span> Pricing</button>
+
+  <p class="px-2 pt-4 pb-1 text-[10px] font-bold text-ink-300 uppercase tracking-widest">About</p>
+  <button onclick="goTo('roadmap')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-gold-600 text-xl">volunteer_activism</span> Social Impact</button>
+  <button onclick="goTo('profile')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-700 hover:bg-ink-50 text-left"><span class="material-icons text-ink-500 text-xl">person</span> Profile</button>
+
+  <button onclick="toggleContactDropdown()" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-ink-400 hover:bg-ink-50 text-left mt-1">
+    <span class="flex items-center gap-3"><span class="material-icons text-ink-300 text-xl">mail_outline</span> Contact</span>
+    <span class="material-icons text-base" id="contact-chevron-desktop">expand_more</span>
+  </button>
+  <div id="contact-dropdown-desktop" class="hidden pl-11 pr-3 pb-2 space-y-1">
+    <a href="https://x.com/Ubongabasi_ae" target="_blank" class="block text-xs text-ink-400 py-1">𝕏 @Ubongabasi_ae</a>
+    <a href="mailto:daekas2@gmail.com" class="block text-xs text-ink-400 py-1">✉ daekas2@gmail.com</a>
+  </div>
+
+  <div class="border-t border-ink-100 mt-3 pt-3 px-1">
+    <p class="px-2 pb-2 text-[10px] font-bold text-ink-300 uppercase tracking-widest">Appearance</p>
+    <div class="flex items-center gap-2 bg-ink-50 rounded-xl p-1">
+      <button onclick="setTheme('light')" data-theme-btn-d="light" class="theme-btn-d flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold"><span class="material-icons text-base">light_mode</span> Light</button>
+      <button onclick="setTheme('dark')" data-theme-btn-d="dark" class="theme-btn-d flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold"><span class="material-icons text-base">dark_mode</span> Dark</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ============ MAIN ============ -->
+<main class="max-w-xl md:max-w-5xl mx-auto pb-28 md:pb-10 md:pl-64 min-h-[70vh]">
+<!-- ===================== VIEW: DISCOVER ===================== -->
+<section id="view-discover" class="view active px-4 pt-4 space-y-4">
+
+  <div class="flex items-center gap-2 bg-white border border-ink-100 rounded-2xl px-4 py-3 shadow-card">
+    <span class="material-icons text-ink-300 text-xl">search</span>
+    <input id="discover-search" oninput="renderDiscoverGrid()" type="text" placeholder="Search dishes, tribes, states…" class="bg-transparent outline-none text-sm flex-1 placeholder-ink-300">
+  </div>
+
+  <div id="discover-filters" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+    <button data-filter="All" onclick="setMealFilter('All')" class="chip active whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-ink-100 bg-white text-ink-600">All</button>
+    <button data-filter="Breakfast" onclick="setMealFilter('Breakfast')" class="chip whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-ink-100 bg-white text-ink-600">🌅 Breakfast</button>
+    <button data-filter="Lunch" onclick="setMealFilter('Lunch')" class="chip whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-ink-100 bg-white text-ink-600">☀️ Lunch</button>
+    <button data-filter="Dinner" onclick="setMealFilter('Dinner')" class="chip whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-ink-100 bg-white text-ink-600">🌙 Dinner</button>
+    <button data-filter="Tribes" onclick="toggleTribeRow()" class="chip whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border border-ink-100 bg-white text-ink-600">🧬 Tribes</button>
+  </div>
+
+  <div id="tribe-filter-row" class="hidden flex-wrap gap-2"></div>
+
+  <div id="discover-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+  <p id="discover-empty" class="hidden text-center text-sm text-ink-400 py-10">No dishes match yet — try another filter, or be the first to <button onclick="goTo('ingest')" class="text-leaf-600 font-bold underline">add one</button>.</p>
+</section>
+<!-- ===================== VIEW: FOODMAP (states grid) ===================== -->
+<section id="view-foodmap" class="view px-4 pt-4 space-y-4">
+  <div>
+    <p class="text-xs font-bold text-gold-600 uppercase tracking-widest">Nigerian Heritage</p>
+    <h2 class="font-display font-bold text-2xl text-ink-800">FoodMap</h2>
+    <p class="text-xs text-ink-400 mt-1">Swipe through all 36 states. Tap one to see its indigenous dishes.</p>
+  </div>
+  <div id="states-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+</section>
+
+<!-- ===================== VIEW: FOODMAP STATE DETAIL ===================== -->
+<section id="view-state-detail" class="view px-4 pt-4 space-y-4">
+  <button onclick="goTo('foodmap')" class="flex items-center gap-1 text-sm font-bold text-ink-500"><span class="material-icons text-base">arrow_back</span> All States</button>
+  <div id="state-detail-header" class="rounded-2xl overflow-hidden relative h-36"></div>
+  <p id="state-detail-bio" class="text-sm text-ink-500 leading-relaxed"></p>
+  <p class="text-xs font-bold text-ink-400 uppercase tracking-widest">Available dishes</p>
+  <div id="state-detail-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+</section>
+<!-- ===================== VIEW: PROCESS SCREEN (universal dish detail) ===================== -->
+<section id="view-process" class="view">
+  <div id="process-hero" class="relative h-56 bg-ink-100">
+    <button onclick="closeProcess()" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-black/40 backdrop-blur flex items-center justify-center text-white z-10"><span class="material-icons text-lg">close</span></button>
+    <img id="process-image" src="" onerror="this.onerror=null;this.src=window.__processImgFallback||''" class="w-full h-full object-cover" alt="">
+    <div id="process-golden-badge" class="hidden absolute top-3 right-3 bg-gold-400 text-gold-800 text-[10px] font-extrabold px-3 py-1 rounded-full shadow-lift flex items-center gap-1"><span class="material-icons text-sm">workspace_premium</span> NEEDS RECIPE</div>
+    <div class="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-black/60 to-transparent"></div>
+  </div>
+
+  <div class="px-4 -mt-6 relative z-10">
+    <div class="bg-white rounded-3xl shadow-lift p-5 space-y-5">
+      <div>
+        <h2 id="process-title" class="font-display font-bold text-2xl text-ink-800"></h2>
+        <p id="process-meta" class="text-xs text-ink-400 font-semibold mt-1"></p>
+      </div>
+      <p id="process-desc" class="text-sm text-ink-600 leading-relaxed"></p>
+
+      <!-- GOLDEN: contribute CTA (shown instead of process detail) -->
+      <div id="process-golden-cta" class="hidden bg-gold-50 border border-gold-200 rounded-2xl p-5 text-center space-y-3">
+        <span class="material-icons text-gold-500 text-4xl">emoji_objects</span>
+        <p class="text-sm font-bold text-ink-700">Process unavailable — nobody's documented this one yet.</p>
+        <button onclick="goToIngestFromGolden()" class="w-full py-3 rounded-xl bg-gold-500 text-white font-bold text-sm active:scale-95 transition-transform">Contribute &amp; Earn XP</button>
+      </div>
+
+      <!-- NORMAL: full process detail -->
+      <div id="process-full-detail" class="space-y-5">
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-ink-50 rounded-xl py-2">
+            <p class="text-[10px] text-ink-400 font-bold uppercase">Prep</p>
+            <p id="process-preptime" class="font-display font-bold text-sm text-ink-700"></p>
+          </div>
+          <div class="bg-ink-50 rounded-xl py-2">
+            <p class="text-[10px] text-ink-400 font-bold uppercase">Difficulty</p>
+            <p id="process-difficulty" class="font-display font-bold text-sm text-ink-700"></p>
+          </div>
+          <div class="bg-ink-50 rounded-xl py-2">
+            <p class="text-[10px] text-ink-400 font-bold uppercase">Servings</p>
+            <p id="process-servings" class="font-display font-bold text-sm text-ink-700"></p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold text-ink-400 uppercase tracking-widest mb-2">Ingredients</h3>
+          <ul id="process-ingredients" class="space-y-1.5 text-sm text-ink-600"></ul>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-bold text-ink-400 uppercase tracking-widest">Steps</h3>
+            <div class="flex items-center gap-2 bg-leaf-50 border border-leaf-200 rounded-full px-3 py-1">
+              <span class="material-icons text-leaf-600 text-base">timer</span>
+              <span id="stopwatch-display" class="font-display font-bold text-sm text-leaf-700 tabular-nums">00:00</span>
+              <button onclick="toggleStopwatch()" id="stopwatch-btn" class="text-leaf-600"><span class="material-icons text-lg">play_circle</span></button>
+            </div>
+          </div>
+          <ol id="process-steps" class="space-y-3"></ol>
+        </div>
+
+        <div>
+          <h3 class="text-xs font-bold text-ink-400 uppercase tracking-widest mb-1">Tribe &amp; Origin</h3>
+          <p id="process-glossary" class="text-sm text-ink-600 leading-relaxed"></p>
+        </div>
+
+        <div class="border-t border-ink-100 pt-4">
+          <h3 class="text-xs font-bold text-ink-400 uppercase tracking-widest mb-2">Rate this dish</h3>
+          <div class="flex items-center gap-1" id="process-rating-stars"></div>
+          <p id="process-rating-count" class="text-xs text-ink-400 mt-1"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="h-10"></div>
+</section>
+<!-- ===================== VIEW: INGEST WIZARD ===================== -->
+<section id="view-ingest" class="view px-4 pt-4 space-y-5">
+  <div>
+    <p class="text-xs font-bold text-leaf-600 uppercase tracking-widest">Add a dish</p>
+    <h2 class="font-display font-bold text-2xl text-ink-800">Ingest Wizard</h2>
+  </div>
+
+  <!-- Step progress -->
+  <div class="flex items-center gap-1" id="ingest-progress">
+    <div class="h-1.5 flex-1 rounded-full bg-leaf-600" data-step="1"></div>
+    <div class="h-1.5 flex-1 rounded-full bg-ink-100" data-step="2"></div>
+    <div class="h-1.5 flex-1 rounded-full bg-ink-100" data-step="3"></div>
+    <div class="h-1.5 flex-1 rounded-full bg-ink-100" data-step="4"></div>
+    <div class="h-1.5 flex-1 rounded-full bg-ink-100" data-step="5"></div>
+  </div>
+
+  <!-- STEP 1: media -->
+  <div class="ingest-step" data-step="1">
+    <p class="font-bold text-ink-700 mb-3">1. Show us the dish</p>
+    <label class="block border-2 border-dashed border-ink-200 rounded-2xl p-6 text-center cursor-pointer hover:border-leaf-400 transition-colors">
+      <input type="file" accept="image/*" class="hidden" onchange="handleIngestImage(this)">
+      <span class="material-icons text-4xl text-leaf-500">add_a_photo</span>
+      <p class="text-sm font-bold text-ink-600 mt-2">Upload a photo <span class="text-clay-500">(required)</span></p>
+      <p id="ingest-image-filename" class="text-xs text-ink-400 mt-1"></p>
+    </label>
+    <label class="block border-2 border-dashed border-ink-200 rounded-2xl p-6 text-center cursor-pointer hover:border-leaf-400 transition-colors mt-3">
+      <input type="file" accept="video/*" class="hidden" onchange="handleIngestVideo(this)">
+      <span class="material-icons text-4xl text-ink-300">videocam</span>
+      <p class="text-sm font-bold text-ink-600 mt-2">Add a video tutorial <span class="text-ink-400">(optional)</span></p>
+      <p id="ingest-video-filename" class="text-xs text-ink-400 mt-1"></p>
+    </label>
+  </div>
+
+  <!-- STEP 2: ingredients -->
+  <div class="ingest-step hidden" data-step="2">
+    <p class="font-bold text-ink-700 mb-3">2. What goes in it?</p>
+    <div id="ingest-ingredient-list" class="space-y-2 mb-3"></div>
+    <div class="flex gap-2">
+      <input id="ingest-ingredient-input" type="text" placeholder="e.g. Ground meat, rice, pepper…" class="flex-1 bg-white border border-ink-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-leaf-400">
+      <button onclick="addIngestIngredient()" class="w-11 h-11 rounded-xl bg-leaf-600 text-white flex items-center justify-center active:scale-95 transition-transform"><span class="material-icons">add</span></button>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mt-2">
+      <span class="text-[10px] text-ink-400 font-semibold">Suggestions:</span>
+      <button onclick="addSuggestedIngredient('Ground crayfish')" class="text-[11px] bg-ink-50 px-2 py-1 rounded-full text-ink-600">+ Ground crayfish</button>
+      <button onclick="addSuggestedIngredient('Palm oil')" class="text-[11px] bg-ink-50 px-2 py-1 rounded-full text-ink-600">+ Palm oil</button>
+      <button onclick="addSuggestedIngredient('Scotch bonnet pepper')" class="text-[11px] bg-ink-50 px-2 py-1 rounded-full text-ink-600">+ Scotch bonnet</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: preparation steps -->
+  <div class="ingest-step hidden" data-step="3">
+    <p class="font-bold text-ink-700 mb-3">3. Walk us through it</p>
+    <div id="ingest-steps-list" class="space-y-2 mb-3"></div>
+    <textarea id="ingest-step-input" placeholder="Describe this step…" rows="2" class="w-full bg-white border border-ink-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-leaf-400"></textarea>
+    <button onclick="addIngestStep()" class="mt-2 w-full py-2.5 rounded-xl bg-ink-800 text-white font-bold text-sm active:scale-95 transition-transform">+ Add step</button>
+  </div>
+
+  <!-- STEP 4: AI review -->
+  <div class="ingest-step hidden" data-step="4">
+    <p class="font-bold text-ink-700 mb-3">4. Review your submission</p>
+    <div class="bg-leaf-50 border border-leaf-200 rounded-2xl p-4 flex items-center gap-2 mb-3">
+      <span class="material-icons text-leaf-600 animate-pulse">auto_awesome</span>
+      <p class="text-xs font-semibold text-leaf-700">Our assistant has organized your submission below.</p>
+    </div>
+    <div class="bg-white border border-ink-100 rounded-2xl p-4 space-y-3 text-sm">
+      <div><span class="font-bold text-ink-700">Photo:</span> <span id="review-image" class="text-ink-500"></span></div>
+      <div><span class="font-bold text-ink-700">Ingredients:</span> <span id="review-ingredients" class="text-ink-500"></span></div>
+      <div><span class="font-bold text-ink-700">Steps:</span> <span id="review-steps" class="text-ink-500"></span></div>
+    </div>
+    <button onclick="confirmIngest()" class="mt-4 w-full py-3 rounded-xl bg-leaf-600 text-white font-bold text-sm active:scale-95 transition-transform">Yes, I confirm this</button>
+  </div>
+
+  <!-- STEP 5: submitted -->
+  <div class="ingest-step hidden text-center py-8 space-y-3" data-step="5">
+    <span class="material-icons text-leaf-500 text-6xl">task_alt</span>
+    <p class="font-display font-bold text-xl text-ink-800">Submitted for review</p>
+    <p class="text-sm text-ink-500 max-w-xs mx-auto">Thank you for helping preserve this dish. Our team reviews new submissions and you'll hear back within 24 hours.</p>
+    <button onclick="resetIngest()" class="mt-2 px-5 py-2.5 rounded-xl bg-ink-800 text-white font-bold text-sm">Add another dish</button>
+  </div>
+
+  <!-- Nav buttons -->
+  <div id="ingest-nav" class="flex gap-2 pt-2">
+    <button id="ingest-back-btn" onclick="ingestBack()" class="hidden flex-1 py-3 rounded-xl border border-ink-200 text-ink-600 font-bold text-sm">Back</button>
+    <button id="ingest-next-btn" onclick="ingestNext()" class="flex-1 py-3 rounded-xl bg-ink-800 text-white font-bold text-sm active:scale-95 transition-transform">Next</button>
+  </div>
+</section>
+<!-- ===================== VIEW: BLOG ===================== -->
+<section id="view-blog" class="view px-4 pt-4 space-y-4 relative">
+  <div>
+    <p class="text-xs font-bold text-gold-600 uppercase tracking-widest">Heritage Blog</p>
+    <h2 class="font-display font-bold text-2xl text-ink-800">Stories worth keeping</h2>
+  </div>
+  <div id="blog-grid" class="space-y-4"></div>
+  <button onclick="openCompose()" class="fixed bottom-24 right-5 w-14 h-14 rounded-full bg-clay-500 text-white shadow-lift flex items-center justify-center active:scale-95 transition-transform z-30">
+    <span class="material-icons">edit</span>
+  </button>
+</section>
+
+<!-- ===================== VIEW: BLOG POST READ ===================== -->
+<section id="view-blog-post" class="view">
+  <div id="blog-post-hero" class="relative h-56 bg-ink-100">
+    <button onclick="goTo('blog')" class="absolute top-3 left-3 w-9 h-9 rounded-full bg-black/40 backdrop-blur flex items-center justify-center text-white z-10"><span class="material-icons text-lg">arrow_back</span></button>
+    <img id="blog-post-image" src="" class="w-full h-full object-cover">
+  </div>
+  <div class="px-4 -mt-6 relative z-10">
+    <div class="bg-white rounded-3xl shadow-lift p-5 space-y-3">
+      <p id="blog-post-tag" class="text-xs font-bold text-clay-500 uppercase tracking-widest"></p>
+      <h2 id="blog-post-title" class="font-display font-bold text-2xl text-ink-800 leading-tight"></h2>
+      <p id="blog-post-author" class="text-xs text-ink-400 font-semibold"></p>
+      <p id="blog-post-body" class="text-sm text-ink-600 leading-relaxed whitespace-pre-line"></p>
+    </div>
+  </div>
+  <div class="h-10"></div>
+</section>
+
+<!-- ===================== COMPOSE MODAL ===================== -->
+<div id="compose-scrim" class="hidden fixed inset-0 bg-black/40 z-50" onclick="closeCompose()"></div>
+<div id="compose-sheet" class="modal-sheet closed fixed bottom-0 inset-x-0 z-50 bg-white rounded-t-3xl max-h-[90vh] overflow-y-auto">
+  <div class="sticky top-0 bg-white px-4 pt-4 pb-2 border-b border-ink-100 flex items-center justify-between">
+    <p class="font-display font-bold text-lg">New story</p>
+    <button onclick="closeCompose()" class="w-8 h-8 rounded-full bg-ink-50 flex items-center justify-center"><span class="material-icons text-lg">close</span></button>
+  </div>
+  <div class="p-4 space-y-3" id="compose-form">
+    <input id="compose-title" type="text" placeholder="Give it a title…" class="w-full bg-ink-50 rounded-xl px-3 py-2.5 text-sm outline-none">
+    <textarea id="compose-body" oninput="updateWordCount()" rows="8" placeholder="Tell the story… (min. 250 words)" class="w-full bg-ink-50 rounded-xl px-3 py-2.5 text-sm outline-none"></textarea>
+    <p id="compose-wordcount" class="text-xs text-ink-400 text-right">0 / 250 words</p>
+    <label class="block border-2 border-dashed border-ink-200 rounded-xl p-4 text-center cursor-pointer">
+      <input type="file" accept="image/*" class="hidden" onchange="handleComposeImage(this)">
+      <span class="material-icons text-ink-300">image</span>
+      <p id="compose-image-filename" class="text-xs text-ink-400 mt-1">Add a cover image</p>
+    </label>
+    <button onclick="previewCompose()" class="w-full py-3 rounded-xl bg-ink-800 text-white font-bold text-sm">Preview</button>
+  </div>
+  <div class="p-4 space-y-3 hidden" id="compose-preview">
+    <p class="text-xs font-bold text-ink-400 uppercase">Preview</p>
+    <div class="rounded-2xl overflow-hidden border border-ink-100">
+      <img id="compose-preview-img" class="w-full h-36 object-cover">
+      <div class="p-3">
+        <p id="compose-preview-title" class="font-display font-bold text-lg"></p>
+        <p id="compose-preview-body" class="text-xs text-ink-500 mt-1 line-clamp-3"></p>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="backToComposeForm()" class="flex-1 py-3 rounded-xl border border-ink-200 font-bold text-sm">Edit</button>
+      <button onclick="publishCompose()" class="flex-1 py-3 rounded-xl bg-leaf-600 text-white font-bold text-sm">Publish</button>
+    </div>
+  </div>
+</div>
+<!-- ===================== VIEW: PRICING ===================== -->
+<section id="view-pricing" class="view px-4 pt-4 space-y-4">
+  <div>
+    <p class="text-xs font-bold text-leaf-600 uppercase tracking-widest">Plans</p>
+    <h2 class="font-display font-bold text-2xl text-ink-800">Built to sustain, not to gatekeep</h2>
+    <p class="text-sm text-ink-500 mt-1">CulinaryOS is a social impact project. Our archive stays open — grants, sponsorships, and these light tiers keep it running.</p>
+  </div>
+
+  <div class="bg-white border border-ink-100 rounded-2xl p-5 shadow-card">
+    <p class="font-display font-bold text-lg text-ink-800">Community</p>
+    <p class="text-xs text-ink-400 mb-3">For anyone who wants to explore or preserve heritage food</p>
+    <p class="font-display font-bold text-3xl text-ink-800 mb-3">No cost</p>
+    <ul class="text-sm text-ink-600 space-y-1.5">
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Full food library</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Ingest Wizard — upload dishes</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Read the Heritage Blog</li>
+      <li class="flex items-center gap-2 text-ink-400"><span class="material-icons text-ink-300 text-base">block</span> No social/website link on your contributions</li>
+      <li class="flex items-center gap-2 text-ink-400"><span class="material-icons text-ink-300 text-base">block</span> Can't publish blog articles</li>
+    </ul>
+  </div>
+
+  <div class="bg-ink-800 rounded-2xl p-5 shadow-lift text-white relative overflow-hidden">
+    <div class="absolute -top-6 -right-6 w-24 h-24 bg-gold-400/20 rounded-full"></div>
+    <p class="font-display font-bold text-lg">Elegant <span class="text-xs font-normal text-ink-300">(Premium)</span></p>
+    <p class="text-xs text-ink-300 mb-3">For chefs, creators &amp; small food businesses</p>
+    <p class="font-display font-bold text-3xl mb-3">₦500<span class="text-sm font-normal text-ink-300">/mo</span></p>
+    <ul class="text-sm text-ink-200 space-y-1.5 mb-4">
+      <li class="flex items-center gap-2"><span class="material-icons text-gold-400 text-base">check_circle</span> Link your social &amp; website to your contributions</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-gold-400 text-base">check_circle</span> Publish articles on the Blog</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-gold-400 text-base">check_circle</span> Recognition on the dishes you complete</li>
+    </ul>
+    <button onclick="showUpgradeGate()" class="w-full py-3 rounded-xl bg-gold-400 text-ink-800 font-bold text-sm active:scale-95 transition-transform">Upgrade to Elegant</button>
+  </div>
+
+  <div class="bg-white border border-ink-100 rounded-2xl p-5 shadow-card">
+    <p class="font-display font-bold text-lg text-ink-800">Enterprise</p>
+    <p class="text-xs text-ink-400 mb-3">For brands &amp; industry partners</p>
+    <p class="font-display font-bold text-xl text-ink-800 mb-3">Contact us</p>
+    <ul class="text-sm text-ink-600 space-y-1.5 mb-3">
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Sponsored recipe placements <span class="text-ink-400">(e.g. "How to make Egusi — sponsored by [Brand]")</span></li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Branded collection blocks</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Priority access to V3 Simulation &amp; Dev Sandbox testing</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-500 text-base">check_circle</span> Full platform access</li>
+    </ul>
+    <button onclick="goTo('roadmap')" class="w-full py-3 rounded-xl border border-ink-200 text-ink-700 font-bold text-sm">Talk to the team</button>
+  </div>
+
+  <div class="bg-leaf-50 border border-leaf-200 rounded-2xl p-5">
+    <p class="font-display font-bold text-lg text-ink-800">NGO &amp; Government</p>
+    <p class="text-xs text-ink-400 mb-3">For institutions supporting cultural preservation</p>
+    <p class="font-display font-bold text-xl text-ink-800 mb-3">Partnership</p>
+    <ul class="text-sm text-ink-600 space-y-1.5 mb-3">
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-600 text-base">check_circle</span> Platform access &amp; visibility</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-600 text-base">check_circle</span> Cultural preservation partnership</li>
+      <li class="flex items-center gap-2"><span class="material-icons text-leaf-600 text-base">check_circle</span> Social impact association</li>
+    </ul>
+    <button onclick="goTo('roadmap')" class="w-full py-3 rounded-xl bg-leaf-600 text-white font-bold text-sm">Partner with us</button>
+  </div>
+
+  <p class="text-center text-xs text-ink-400 pt-1">Our revenue comes primarily from grants and sponsorships — these tiers exist to keep the archive sustainable, not to fund it.</p>
+</section>
+
+<!-- Upgrade gate overlay -->
+<div id="upgrade-gate" class="hidden fixed inset-0 z-50 bg-ink-900/80 flex items-center justify-center px-6">
+  <div class="text-center relative max-w-xs">
+    <button onclick="closeUpgradeGate()" class="absolute -top-10 right-0 text-white/70"><span class="material-icons text-3xl">close</span></button>
+    <span class="material-icons text-gold-400 text-5xl mb-3">hourglass_top</span>
+    <p class="font-display font-bold text-2xl text-white">V2 coming soon</p>
+    <p class="text-sm text-white/60 mt-2">Premium upgrades are on hold while we build. Everything's unlocked for now — enjoy it.</p>
+  </div>
+</div>
+
+<!-- Gate contact popup: shown when tapping "View Demo" on Sandbox/Simulation -->
+<div id="gate-contact-popup" class="hidden fixed inset-0 z-50 bg-ink-900/80 flex items-center justify-center px-6">
+  <div class="bg-white rounded-2xl p-6 max-w-xs text-center space-y-3 relative">
+    <button onclick="closeGateContactPopup()" class="absolute top-3 right-3 text-ink-300"><span class="material-icons text-xl">close</span></button>
+    <span class="material-icons text-leaf-600 text-4xl">mail_outline</span>
+    <p class="font-display font-bold text-lg text-ink-800">This is a V3 feature</p>
+    <p id="gate-contact-popup-text" class="text-sm text-ink-500"></p>
+    <a href="mailto:daekas2@gmail.com?subject=CulinaryOS%20V3%20Access" class="block w-full py-2.5 rounded-xl bg-ink-800 text-white font-bold text-sm">Contact the team</a>
+  </div>
+</div>
+
+<!-- ===================== VIEW: DEV SANDBOX (gated) ===================== -->
+<section id="view-sandbox" class="view px-4 pt-4">
+  <div class="text-center py-14 px-4 space-y-3">
+    <span class="material-icons text-leaf-500 text-5xl">data_object</span>
+    <p class="font-display font-bold text-xl text-ink-800">Still in data-accumulation phase</p>
+    <p class="text-sm text-ink-500 max-w-xs mx-auto">CulinaryOS is gathering the heritage dataset that will power our Developer Sandbox. Full infrastructure unlocks in V3.</p>
+    <button onclick="showGateContactPopup('Dev Sandbox')" class="mt-2 px-5 py-2.5 rounded-xl bg-ink-800 text-white font-bold text-sm">View Demo</button>
+  </div>
+</section>
+
+<!-- ===================== VIEW: SIMULATION (gated, same pattern as sandbox) ===================== -->
+<section id="view-simulation" class="view px-4 pt-4">
+  <div class="text-center py-14 px-4 space-y-3">
+    <span class="material-icons text-leaf-500 text-5xl">calculate</span>
+    <p class="font-display font-bold text-xl text-ink-800">Still in data-accumulation phase</p>
+    <p class="text-sm text-ink-500 max-w-xs mx-auto">Our scaling &amp; ratio engine needs a mature recipe dataset to be accurate. It unlocks fully in V3.</p>
+    <button onclick="showGateContactPopup('Simulation')" class="mt-2 px-5 py-2.5 rounded-xl bg-ink-800 text-white font-bold text-sm">View Demo</button>
+  </div>
+</section>
+
+<!-- ===================== VIEW: cmXP MARKETPLACE (blurred teaser) ===================== -->
+<section id="view-cmxp" class="view relative min-h-[70vh] px-6">
+  <div class="absolute inset-0 blurscreen bg-gradient-to-br from-leaf-100 via-white to-gold-50"></div>
+  <div class="relative min-h-[70vh] flex items-center justify-center">
+    <div class="relative text-center max-w-xs space-y-3">
+      <button onclick="goTo('discover')" class="absolute -top-14 right-0 text-ink-500"><span class="material-icons text-2xl">close</span></button>
+      <span class="material-icons text-gold-500 text-5xl">military_tech</span>
+      <p class="font-display font-bold text-2xl text-ink-800">cmXP Marketplace</p>
+      <p class="text-sm text-ink-500">A world where your contributions are rewarded. Coming soon.</p>
+    </div>
+  </div>
+</section>
+<!-- ===================== VIEW: SOCIAL IMPACT (formerly Roadmap) ===================== -->
+<section id="view-roadmap" class="view px-4 pt-4 space-y-5">
+  <div>
+    <p class="text-xs font-bold text-gold-600 uppercase tracking-widest">Who we are</p>
+    <h2 class="font-display font-bold text-2xl text-ink-800">Social Impact</h2>
+    <p class="text-sm text-ink-500 mt-1">CulinaryOS is a social impact project preserving the food culture of our people — making it accessible to generations to come.</p>
+  </div>
+
+  <div class="bg-white border border-ink-100 rounded-2xl p-4 shadow-card">
+    <p class="text-xs font-bold text-leaf-600">NOW — DATA PHASE</p>
+    <p class="font-display font-bold text-lg text-ink-800">Building the archive</p>
+    <p class="text-sm text-ink-500 mt-1">We're gathering Nigeria's dishes, tribe by tribe, state by state. Our social impact work grows directly out of this archive as it matures.</p>
+  </div>
+
+  <div class="bg-leaf-800 rounded-2xl p-5 text-white">
+    <p class="text-xs font-bold text-leaf-200 uppercase tracking-widest">Campaign</p>
+    <p class="font-display font-bold text-lg mt-1">Save The Boy Chef</p>
+    <p class="text-sm text-leaf-100 mt-2 leading-relaxed">Encouraging boys and young men to embrace kitchen life — breaking the stigma that cooking isn't for them, one classroom and one community at a time.</p>
+  </div>
+
+  <div class="bg-clay-500 rounded-2xl p-5 text-white">
+    <p class="text-xs font-bold text-clay-100 uppercase tracking-widest">Roadshow</p>
+    <p class="font-display font-bold text-lg mt-1">Boys Can Cook</p>
+    <p class="text-sm text-white/90 mt-2 leading-relaxed">A touring food-show format bringing live cooking, storytelling and heritage dishes into communities — planned as our archive and partnerships grow.</p>
+  </div>
+
+  <div class="bg-white border border-ink-100 rounded-2xl p-4 shadow-card">
+    <p class="text-xs font-bold text-gold-600">AHEAD</p>
+    <p class="font-display font-bold text-lg text-ink-800">Scaling the impact</p>
+    <p class="text-sm text-ink-500 mt-1">As the data layer matures into full infrastructure (V3), more of what we give back to the community will be funded directly by what we've preserved.</p>
+  </div>
+
+  <div class="text-center pt-2 space-y-2">
+    <p class="text-sm font-bold text-ink-700">Are you a brand, engineer, sponsor, or community?</p>
+    <p class="text-xs text-ink-400 max-w-xs mx-auto">If you want to help preserve the cultural heritage of your tribe, city, region, or country — we're open to it.</p>
+    <a href="mailto:daekas2@gmail.com?subject=CulinaryOS%20Social%20Impact" class="inline-block px-6 py-3 rounded-xl bg-ink-800 text-white font-bold text-sm">Contact the team</a>
+    <p class="text-[11px] text-ink-300 mt-4">Built for Wema Bank's Hackaholics</p>
+  </div>
+</section>
+</main>
+
+<!-- ===================== BOTTOM NAV (primary — 3 items) ===================== -->
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-ink-100 safe-bottom">
+  <div class="max-w-xl mx-auto grid grid-cols-3">
+    <button onclick="goTo('foodmap')" data-nav="foodmap" class="nav-btn flex flex-col items-center gap-0.5 py-3 text-ink-400">
+      <span class="material-icons">map</span>
+      <span class="text-[10px] font-bold">FoodMap</span>
+    </button>
+    <button onclick="goTo('ingest')" data-nav="ingest" class="nav-btn flex flex-col items-center gap-0.5 py-3 text-ink-400">
+      <span class="material-icons">add_circle</span>
+      <span class="text-[10px] font-bold">Ingest</span>
+    </button>
+    <button onclick="goTo('blog')" data-nav="blog" class="nav-btn flex flex-col items-center gap-0.5 py-3 text-ink-400">
+      <span class="material-icons">auto_stories</span>
+      <span class="text-[10px] font-bold">Blog</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===================== HAMBURGER DRAWER (full site map) ===================== -->
+<div id="drawer-scrim" class="scrim opacity-0 pointer-events-none fixed inset-0 bg-black/40 z-40" onclick="closeDrawer()"></div>
+<aside id="drawer" class="drawer closed fixed top-0 right-0 bottom-0 w-[80%] max-w-xs bg-white z-50 shadow-lift overflow-y-auto">
+  <div class="p-4 flex items-center justify-between border-b border-ink-100">
+    <p class="font-display font-bold text-lg">Menu</p>
+    <button onclick="closeDrawer()" class="w-8 h-8 rounded-full bg-ink-50 flex items-center justify-center"><span class="material-icons text-lg">close</span></button>
+  </div>
+  <div class="p-3 space-y-1">
+    <p class="px-2 pt-2 pb-1 text-[10px] font-bold text-ink-300 uppercase tracking-widest">Explore</p>
+    <button onclick="goTo('foodmap')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-leaf-600">map</span> FoodMap</button>
+    <button onclick="goTo('ingest')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-leaf-600">add_circle</span> Ingest Wizard</button>
+    <button onclick="goTo('blog')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-clay-500">auto_stories</span> Blog</button>
+    <button onclick="goTo('discover')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-leaf-600">search</span> Search</button>
+
+    <p class="px-2 pt-4 pb-1 text-[10px] font-bold text-ink-300 uppercase tracking-widest">Platform</p>
+    <button onclick="goTo('sandbox')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-ink-500">data_object</span> Dev Sandbox</button>
+    <button onclick="goTo('simulation')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-ink-500">calculate</span> Simulation</button>
+    <button onclick="goTo('cmxp')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-gold-500">military_tech</span> cmXP Marketplace</button>
+    <button onclick="goTo('pricing')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-ink-500">payments</span> Pricing</button>
+
+    <p class="px-2 pt-4 pb-1 text-[10px] font-bold text-ink-300 uppercase tracking-widest">About</p>
+    <button onclick="goTo('roadmap')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-gold-600">volunteer_activism</span> Social Impact</button>
+    <button onclick="goTo('profile')" class="drawer-item w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-700 active:bg-ink-50"><span class="material-icons text-ink-500">person</span> Profile</button>
+
+    <button onclick="toggleContactDropdown()" class="w-full flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-sm font-semibold text-ink-400">
+      <span class="flex items-center gap-3"><span class="material-icons text-ink-300">mail_outline</span> Contact</span>
+      <span class="material-icons text-base" id="contact-chevron">expand_more</span>
+    </button>
+    <div id="contact-dropdown" class="hidden pl-11 pr-3 pb-2 space-y-1">
+      <a href="https://x.com/Ubongabasi_ae" target="_blank" class="block text-xs text-ink-400 py-1">𝕏 @Ubongabasi_ae</a>
+      <a href="mailto:daekas2@gmail.com" class="block text-xs text-ink-400 py-1">✉ daekas2@gmail.com</a>
+    </div>
+
+    <div class="border-t border-ink-100 mt-3 pt-3 px-1">
+      <p class="px-2 pb-2 text-[10px] font-bold text-ink-300 uppercase tracking-widest">Appearance</p>
+      <div class="flex items-center gap-2 bg-ink-50 rounded-xl p-1">
+        <button onclick="setTheme('light')" data-theme-btn="light" class="theme-btn flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold"><span class="material-icons text-base">light_mode</span> Light</button>
+        <button onclick="setTheme('dark')" data-theme-btn="dark" class="theme-btn flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold"><span class="material-icons text-base">dark_mode</span> Dark</button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== VIEW: PROFILE (minimal placeholder) ===================== -->
+<section id="view-profile" class="view px-4 pt-4">
+</section>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="toast-el fixed bottom-24 left-1/2 -translate-x-1/2 translate-y-20 opacity-0 z-50 bg-ink-800 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lift whitespace-nowrap"></div>
+
+<script>
+// ============================================================
+// DATA — Nigerian states, dishes, blog stories
+// ============================================================
+const STATES = [
+ {name:"Abia",capital:"Umuahia",zone:"South East",tribes:["Igbo"],img:"nigeria,umuahia,city",bio:"Igbo commercial heartland, home to the sprawling Aba markets known for leather and textiles."},
+ {name:"Adamawa",capital:"Yola",zone:"North East",tribes:["Fulani","Hausa"],img:"nigeria,yola,savanna",bio:"A north-eastern crossroad of Fulani pastoralist tradition, bordered by mountains and the Benue river basin."},
+ {name:"Akwa Ibom",capital:"Uyo",zone:"South South",tribes:["Ibibio","Annang"],img:"nigeria,uyo,city",bio:"An oil-producing South-South state and Ibibio/Annang cultural heartland along the Atlantic coast."},
+ {name:"Anambra",capital:"Awka",zone:"South East",tribes:["Igbo"],img:"nigeria,awka,market",bio:"A South-East commercial powerhouse, home to the bustling Onitsha markets and deep Igbo trading heritage."},
+ {name:"Bauchi",capital:"Bauchi",zone:"North East",tribes:["Hausa","Fulani"],img:"nigeria,bauchi,savanna",bio:"A North-East state where Hausa-Fulani tradition meets the ancient Yankari game reserve."},
+ {name:"Bayelsa",capital:"Yenagoa",zone:"South South",tribes:["Ijaw"],img:"nigeria,niger-delta,river",bio:"A riverine Ijaw heartland deep in the Niger Delta, shaped by oil and waterways."},
+ {name:"Benue",capital:"Makurdi",zone:"North Central",tribes:["Tiv","Idoma"],img:"nigeria,makurdi,river",bio:"Known as Nigeria's food basket, home to the Tiv and Idoma people along the fertile Benue river valley."},
+ {name:"Borno",capital:"Maiduguri",zone:"North East",tribes:["Kanuri"],img:"nigeria,maiduguri,sahel",bio:"The historic seat of the Kanem-Bornu empire and Kanuri culture in Nigeria's far North-East."},
+ {name:"Cross River",capital:"Calabar",zone:"South South",tribes:["Efik"],img:"calabar,nigeria,city",bio:"Home to Calabar's famous carnival, the Efik people, and Nigeria's richest rainforest biodiversity."},
+ {name:"Delta",capital:"Asaba",zone:"South South",tribes:["Urhobo","Igbo","Ijaw"],img:"nigeria,asaba,river",bio:"An oil-rich Niger Delta state, home to Urhobo, Igbo and Ijaw communities along its creeks."},
+ {name:"Ebonyi",capital:"Abakaliki",zone:"South East",tribes:["Igbo"],img:"nigeria,abakaliki,farmland",bio:"A quiet agricultural Igbo state in the South-East, known for rice farming and salt lakes."},
+ {name:"Edo",capital:"Benin City",zone:"South South",tribes:["Edo","Bini"],img:"benin-city,nigeria",bio:"Home to the ancient Benin Kingdom and Bini culture, one of West Africa's great historic civilizations."},
+ {name:"Ekiti",capital:"Ado-Ekiti",zone:"South West",tribes:["Yoruba"],img:"nigeria,ekiti,hills",bio:"A hilly Yoruba state in the South-West known for its scholarly heritage and cool climate."},
+ {name:"Enugu",capital:"Enugu",zone:"South East",tribes:["Igbo"],img:"enugu,nigeria,city",bio:"The old coal city — a South-East Igbo hub blending colonial history with modern commerce."},
+ {name:"Gombe",capital:"Gombe",zone:"North East",tribes:["Hausa","Fulani"],img:"nigeria,gombe,savanna",bio:"A North-East Hausa-Fulani state known as the 'Jewel in the Savannah.'"},
+ {name:"Imo",capital:"Owerri",zone:"South East",tribes:["Igbo"],img:"owerri,nigeria,city",bio:"A densely populated South-East Igbo state known for its markets and palm produce."},
+ {name:"Jigawa",capital:"Dutse",zone:"North West",tribes:["Hausa","Fulani"],img:"nigeria,jigawa,sahel",bio:"A North-West Hausa-Fulani farming state carved from Kano, bordering the Sahel."},
+ {name:"Kaduna",capital:"Kaduna",zone:"North West",tribes:["Hausa","Fulani"],img:"kaduna,nigeria,city",bio:"A historic North-West crossroads of Hausa-Fulani and diverse ethnic communities."},
+ {name:"Kano",capital:"Kano",zone:"North West",tribes:["Hausa"],img:"kano,nigeria,market",bio:"Nigeria's ancient Hausa trading city, famed for its dye pits, walled old city, and centuries of trans-Saharan commerce."},
+ {name:"Katsina",capital:"Katsina",zone:"North West",tribes:["Hausa"],img:"nigeria,katsina,savanna",bio:"A North-West Hausa emirate state with deep Islamic scholarly and trading traditions."},
+ {name:"Kebbi",capital:"Birnin Kebbi",zone:"North West",tribes:["Hausa","Fulani"],img:"nigeria,kebbi,river",bio:"Home of the Argungu fishing festival and Hausa-Fulani riverine farming communities."},
+ {name:"Kogi",capital:"Lokoja",zone:"North Central",tribes:["Igala","Ebira"],img:"lokoja,nigeria,confluence",bio:"The 'confluence state,' where the Niger and Benue rivers meet, home to Igala and Ebira peoples."},
+ {name:"Kwara",capital:"Ilorin",zone:"North Central",tribes:["Yoruba","Nupe"],img:"ilorin,nigeria,city",bio:"A North-Central meeting point of Yoruba and Nupe culture, centred on the historic city of Ilorin."},
+ {name:"Lagos",capital:"Ikeja",zone:"South West",tribes:["Yoruba"],img:"lagos,nigeria,skyline",bio:"Nigeria's commercial megacity and former capital — a Yoruba coastal metropolis and West Africa's financial hub."},
+ {name:"Nasarawa",capital:"Lafia",zone:"North Central",tribes:["Eggon","Hausa"],img:"nigeria,lafia,hills",bio:"A North-Central state of diverse ethnic minorities, rich in solid minerals and farmland."},
+ {name:"Niger",capital:"Minna",zone:"North Central",tribes:["Nupe","Hausa"],img:"nigeria,minna,rock",bio:"Nigeria's largest state by land area, home to Nupe and Hausa river communities."},
+ {name:"Ogun",capital:"Abeokuta",zone:"South West",tribes:["Yoruba","Egba"],img:"abeokuta,nigeria,rock",bio:"A South-West Yoruba industrial state, birthplace of the Ojude Oba festival and gateway to Lagos."},
+ {name:"Ondo",capital:"Akure",zone:"South West",tribes:["Yoruba"],img:"akure,nigeria,forest",bio:"A South-West Yoruba state known for cocoa farming and its Atlantic coastline."},
+ {name:"Osun",capital:"Osogbo",zone:"South West",tribes:["Yoruba"],img:"osogbo,nigeria,grove",bio:"Spiritual home of the Osun-Osogbo festival and the Yoruba goddess Osun, a UNESCO heritage site."},
+ {name:"Oyo",capital:"Ibadan",zone:"South West",tribes:["Yoruba"],img:"ibadan,nigeria,city",bio:"The historic seat of the old Oyo Empire, one of Yoruba culture's great political centres."},
+ {name:"Plateau",capital:"Jos",zone:"North Central",tribes:["Berom","Various"],img:"jos,nigeria,plateau",bio:"A cool, scenic North-Central state atop the Jos Plateau, home to dozens of ethnic minority groups."},
+ {name:"Rivers",capital:"Port Harcourt",zone:"South South",tribes:["Ijaw","Ikwerre"],img:"port-harcourt,nigeria",bio:"Nigeria's oil capital — a Niger Delta hub of Ijaw and Ikwerre culture centred on Port Harcourt."},
+ {name:"Sokoto",capital:"Sokoto",zone:"North West",tribes:["Hausa","Fulani"],img:"sokoto,nigeria,mosque",bio:"Seat of the historic Sokoto Caliphate, a centre of Hausa-Fulani Islamic scholarship."},
+ {name:"Taraba",capital:"Jalingo",zone:"North East",tribes:["Mumuye","Various"],img:"nigeria,taraba,hills",bio:"A scenic North-East state of rolling hills, home to dozens of minority ethnic groups."},
+ {name:"Yobe",capital:"Damaturu",zone:"North East",tribes:["Kanuri"],img:"nigeria,yobe,sahel",bio:"A North-East Kanuri state on the edge of the Sahel, bordering Niger Republic."},
+ {name:"Zamfara",capital:"Gusau",zone:"North West",tribes:["Hausa","Fulani"],img:"nigeria,zamfara,savanna",bio:"A North-West Hausa-Fulani farming state known for its grain markets."},
+ {name:"FCT",capital:"Abuja",zone:"North Central",tribes:["Gwari","Various"],img:"abuja,nigeria,skyline",bio:"Nigeria's purpose-built federal capital — home to Abuja and a melting pot of every tribe in the country."},
+];
+</script>
+<script>
+const DISHES = [
+{id:1,name:"Jollof Rice",tribe:"Yoruba",states:["Lagos","Ogun","Oyo"],meal:"Dinner",confidence:"verified",img:"jollof-rice,nigeria",
+ desc:"A celebrated one-pot dish of rice cooked in a rich, spiced tomato and pepper stew — arguably Nigeria's most famous export.",
+ glossary:"Jollof is claimed across West Africa, but the Nigerian version — smoky, peppery, cooked down until the rice drinks up the stew — is a point of national pride.",
+ prep:"25 mins",difficulty:"Medium",servings:6,rating:4.8,ratingCount:1240,
+ ingredients:["Long-grain parboiled rice","Fresh tomatoes","Red bell peppers","Scotch bonnet pepper","Onions","Tomato paste","Chicken or beef stock","Vegetable oil","Bay leaves","Curry powder & thyme"],
+ steps:[["Blend the base","Blend tomatoes, red peppers, scotch bonnet and onion into a smooth paste."],["Fry the stew","Fry tomato paste in oil, add the blended base, and cook down until the oil separates."],["Add the rice","Stir in parboiled rice, stock, bay leaves, curry and thyme."],["Steam it low","Cover tightly and cook on low heat until the rice is tender and slightly smoky at the bottom."]]},
+
+{id:2,name:"Nigerian Fried Rice",tribe:"Pan-Nigerian",states:["Lagos"],meal:"Lunch",confidence:"verified",img:"fried-rice,vegetables",
+ desc:"Stir-fried rice loaded with mixed vegetables, shrimp and liver, seasoned with curry powder — a staple at every party jollof-fried-rice combo.",
+ glossary:"Usually served alongside Jollof at celebrations — the two rices side by side on one plate is a Nigerian party tradition.",
+ prep:"30 mins",difficulty:"Medium",servings:6,rating:4.6,ratingCount:860,
+ ingredients:["Parboiled rice","Mixed vegetables (carrots, peas, sweetcorn)","Liver","Shrimp","Curry powder","Green bell pepper","Vegetable oil","Onion"],
+ steps:[["Par-cook the rice","Boil rice until just tender, then drain."],["Fry the base","Sauté onion, curry powder and diced vegetables in oil."],["Combine","Toss the rice through, add shrimp and liver, stir-fry until evenly coated."]]},
+
+{id:3,name:"Ofada Rice & Ayamase",tribe:"Yoruba",states:["Ogun","Oyo"],meal:"Lunch",confidence:"verified",img:"ofada-rice,stew",
+ desc:"Unpolished local rice paired with a spicy, dark stew made from bleached palm oil, green bell peppers and assorted meats.",
+ glossary:"Ofada rice is native to Ogun State's Ofada town; Ayamase (\"designer stew\") gets its color from bleaching the palm oil before cooking.",
+ prep:"40 mins",difficulty:"Hard",servings:5,rating:4.7,ratingCount:410,
+ ingredients:["Ofada rice","Green bell peppers","Scotch bonnet pepper","Bleached palm oil","Assorted meat & offal","Locust beans (iru)","Onion"],
+ steps:[["Cook the rice","Boil ofada rice until tender; rinse well to remove husk debris."],["Bleach the oil","Heat palm oil until it lightens in color."],["Build the stew","Fry onions and locust beans, add blended peppers, then the bleached oil and assorted meat."],["Simmer","Cook down until thick and deeply peppery."]]},
+
+{id:4,name:"Asaro (Yam Pottage)",tribe:"Yoruba",states:["Oyo","Ekiti"],meal:"Lunch",confidence:"verified",img:"yam-porridge,stew",
+ desc:"A hearty, comforting pottage of boiled mashed yam cooked in a flavorful blend of palm oil, crayfish and fish.",
+ glossary:"A classic Yoruba comfort food, often made when yam is in season and eaten as a filling one-pot lunch.",
+ prep:"35 mins",difficulty:"Easy",servings:4,rating:4.5,ratingCount:320,
+ ingredients:["Yam, cubed","Palm oil","Ground crayfish","Smoked fish","Scotch bonnet pepper","Onion","Seasoning cubes"],
+ steps:[["Boil the yam","Cook yam cubes with blended pepper and onion until soft."],["Mash it in","Mash slightly, add palm oil, crayfish and smoked fish."],["Simmer","Cook until it thickens into a pottage."]]},
+
+{id:5,name:"Egusi Soup",tribe:"Yoruba / Igbo",states:["Lagos","Anambra","Imo"],meal:"Dinner",confidence:"verified",img:"egusi-soup,nigeria",
+ desc:"A rich, popular soup made from ground melon seeds, thickened with leafy greens and packed with assorted meats.",
+ glossary:"Eaten widely across the south and southwest, egusi is one of the most cooked soups in Nigeria — every family has its own version.",
+ prep:"45 mins",difficulty:"Medium",servings:6,rating:4.8,ratingCount:980,
+ ingredients:["Ground egusi (melon seeds)","Palm oil","Spinach or bitter leaf","Assorted meat","Stockfish","Crayfish","Scotch bonnet pepper","Onion"],
+ steps:[["Fry the egusi","Fry ground egusi in palm oil until it forms small lumps."],["Add stock & meat","Pour in meat stock, add assorted meat, stockfish, crayfish."],["Finish with greens","Stir in the leafy vegetable, simmer briefly and serve."]]},
+
+{id:6,name:"Afang Soup",tribe:"Efik / Ibibio",states:["Cross River","Akwa Ibom"],meal:"Dinner",confidence:"verified",img:"afang-soup,vegetable",
+ desc:"A nutritious, leafy vegetable soup native to the Efik/Ibibio people, blending shredded waterleaf and okazi (afang) leaves.",
+ glossary:"Named after the afang leaf, this soup is a South-South signature dish, distinct from the more widely known Edikang Ikong.",
+ prep:"50 mins",difficulty:"Medium",servings:6,rating:4.7,ratingCount:290,
+ ingredients:["Afang (okazi) leaves","Waterleaf","Palm oil","Periwinkle","Stockfish","Assorted meat","Crayfish","Pepper"],
+ steps:[["Prep the leaves","Shred afang leaves finely; chop waterleaf."],["Cook the meat base","Simmer meat, stockfish and crayfish in palm oil."],["Combine","Add waterleaf first, then afang leaves, simmer briefly to preserve texture."]]},
+
+{id:7,name:"Edikang Ikong",tribe:"Efik / Ibibio",states:["Cross River","Akwa Ibom"],meal:"Dinner",confidence:"verified",img:"edikang-ikong,vegetable-soup",
+ desc:"A heavily nourishing vegetable soup loaded with pumpkin leaves, waterleaf, and proteins like stockfish and snails.",
+ glossary:"Considered one of the most nutrient-dense Nigerian soups, traditionally reserved for special occasions.",
+ prep:"55 mins",difficulty:"Medium",servings:6,rating:4.6,ratingCount:255,
+ ingredients:["Pumpkin leaves (ugwu)","Waterleaf","Palm oil","Stockfish","Snails","Periwinkle","Crayfish"],
+ steps:[["Cook the proteins","Simmer stockfish, snails and meat until tender."],["Wilt the waterleaf","Add waterleaf, cook down to release water."],["Add pumpkin leaves","Stir in ugwu leaves and palm oil, simmer briefly."]]},
+
+{id:8,name:"Banga Soup",tribe:"Urhobo / Ijaw",states:["Delta","Edo","Bayelsa"],meal:"Dinner",confidence:"verified",img:"banga-soup,palm-fruit",
+ desc:"Made from fresh palm fruit extract, native spices and fresh or smoked fish, commonly paired with starch or eba.",
+ glossary:"A signature Niger Delta dish — the palm fruit extract gives it a rich orange color and distinct nutty aroma.",
+ prep:"1 hr",difficulty:"Hard",servings:6,rating:4.7,ratingCount:340,
+ ingredients:["Palm fruit extract (banga)","Banga spice blend","Fresh & smoked fish","Beletete leaves","Scent leaf","Pepper"],
+ steps:[["Extract the palm fruit","Boil and pound palm fruits to extract the sauce."],["Simmer the base","Cook the extract with banga spice until it thickens."],["Add fish & finish","Add fish, beletete and scent leaf, simmer until fragrant."]]},
+
+{id:9,name:"Ogbono Soup",tribe:"Igbo",states:["Imo","Anambra","Delta"],meal:"Dinner",confidence:"verified",img:"ogbono-soup,nigeria",
+ desc:"A thick, draw-soup made from ground wild mango seeds, often cooked with okra and palm oil.",
+ glossary:"Known for its distinctive \"draw\" texture, ogbono is a beloved Igbo soup often eaten with pounded yam or eba.",
+ prep:"35 mins",difficulty:"Easy",servings:5,rating:4.6,ratingCount:410,
+ ingredients:["Ground ogbono seeds","Palm oil","Okra (optional)","Assorted meat","Crayfish","Pepper","Stockfish"],
+ steps:[["Dissolve the ogbono","Mix ground ogbono into hot palm oil, stirring to a smooth paste."],["Add stock","Pour in meat stock gradually, stirring continuously."],["Simmer","Add meat, crayfish and pepper, simmer until it draws."]]},
+
+{id:10,name:"Akara",tribe:"Yoruba",states:["Lagos","Oyo"],meal:"Breakfast",confidence:"verified",img:"akara,bean-cake",
+ desc:"Deep-fried bean fritters made from peeled black-eyed peas, often enjoyed with agege bread or pap (ogi).",
+ glossary:"A breakfast staple sold on nearly every Nigerian street corner in the early morning, crisp outside and fluffy inside.",
+ prep:"20 mins",difficulty:"Easy",servings:4,rating:4.7,ratingCount:610,
+ ingredients:["Peeled black-eyed peas","Onion","Scotch bonnet pepper","Salt","Vegetable oil for frying"],
+ steps:[["Blend the beans","Blend soaked, peeled beans with onion and pepper into a fluffy batter."],["Whip air in","Whisk vigorously to aerate the batter."],["Fry","Scoop and deep fry in hot oil until golden."]]},
+
+{id:11,name:"Moi Moi",tribe:"Yoruba",states:["Lagos"],meal:"Breakfast",confidence:"verified",img:"moi-moi,bean-pudding",
+ desc:"Steamed bean pudding made by blending washed beans with peppers and onions, wrapped in banana leaves or foil.",
+ glossary:"Often served alongside jollof rice at parties, or eaten alone as a protein-rich breakfast.",
+ prep:"1 hr",difficulty:"Medium",servings:6,rating:4.6,ratingCount:390,
+ ingredients:["Peeled beans","Red bell pepper","Onion","Palm oil","Boiled egg (optional)","Fish or corned beef (optional)"],
+ steps:[["Blend","Blend beans, pepper and onion with a little water into a smooth paste."],["Season & pour","Season, add palm oil, pour into wraps or foil cups."],["Steam","Steam for about 45 minutes until firm."]]},
+
+{id:12,name:"Puff Puff",tribe:"Pan-Nigerian",states:["Lagos"],meal:"Breakfast",confidence:"verified",img:"puff-puff,fried-dough",
+ desc:"Sweet, deep-fried dough balls that are golden brown and crispy outside, soft and airy inside.",
+ glossary:"A snack-time and party favorite across every Nigerian region, sold hot in newspaper wraps by roadside vendors.",
+ prep:"1.5 hrs",difficulty:"Easy",servings:8,rating:4.8,ratingCount:520,
+ ingredients:["Flour","Sugar","Yeast","Nutmeg","Warm water","Vegetable oil for frying"],
+ steps:[["Mix the batter","Combine flour, sugar, yeast and nutmeg with warm water into a stretchy batter."],["Let it rise","Cover and let rise for about an hour."],["Fry","Scoop by hand and deep fry until golden and puffed."]]},
+
+{id:13,name:"Boli",tribe:"Yoruba / Igbo",states:["Lagos"],meal:"Lunch",confidence:"verified",img:"grilled-plantain,roasted",
+ desc:"Roasted plantain, commonly served with spicy grilled fish, roasted peanuts, or a rich palm oil stew.",
+ glossary:"A popular roadside snack, especially at dusk, when vendors grill ripe plantain over open coals.",
+ prep:"20 mins",difficulty:"Easy",servings:2,rating:4.5,ratingCount:280,
+ ingredients:["Ripe plantain","Palm oil sauce or peanuts (to serve)"],
+ steps:[["Grill","Roast whole or split plantain over open coals, turning until charred and soft."],["Serve","Serve hot with a peppery palm oil dip or roasted peanuts."]]},
+
+{id:14,name:"Suya",tribe:"Hausa",states:["Kaduna","Kano"],meal:"Dinner",confidence:"verified",img:"suya,grilled-meat-skewers",
+ desc:"Spicy, skewered meat coated in a peanut-based spice blend called yaji, grilled over open flame.",
+ glossary:"Originating with Hausa cattle traders, suya has become a nationwide late-night street food obsession.",
+ prep:"30 mins + marinate",difficulty:"Medium",servings:4,rating:4.9,ratingCount:1100,
+ ingredients:["Beef (thin sliced)","Roasted ground peanuts","Yaji spice blend (ginger, garlic, cayenne)","Onion","Vegetable oil"],
+ steps:[["Coat the meat","Rub meat with oil, then coat generously with yaji spice."],["Skewer","Thread onto skewers."],["Grill","Grill over open flame, turning often, until charred at the edges."]]},
+
+{id:15,name:"Nkwobi",tribe:"Igbo",states:["Anambra","Imo","Enugu"],meal:"Dinner",confidence:"verified",img:"nkwobi,cow-foot",
+ desc:"A rich and spicy cow foot delicacy cooked in a thick, flavorful palm oil paste.",
+ glossary:"A favorite at Igbo social gatherings, traditionally served in a wooden bowl garnished with utazi leaves.",
+ prep:"1.5 hrs",difficulty:"Hard",servings:4,rating:4.7,ratingCount:365,
+ ingredients:["Cow foot","Palm oil","Potash (akanwu)","Ground crayfish","Utazi leaves","Pepper","Onion"],
+ steps:[["Boil the cow foot","Cook cow foot until tender."],["Whip the sauce","Whisk palm oil with potash until it thickens into a paste."],["Combine","Toss the cow foot through the paste, garnish with sliced onion and utazi."]]},
+
+{id:16,name:"Pepper Soup",tribe:"Efik / Igbo",states:["Rivers","Cross River"],meal:"Dinner",confidence:"verified",img:"pepper-soup,nigeria",
+ desc:"A light, watery, fiery broth made with a unique blend of native calabash nutmeg and assorted meats or fish.",
+ glossary:"Often used as a warming, restorative dish — commonly eaten during the rainy season or when unwell.",
+ prep:"40 mins",difficulty:"Easy",servings:4,rating:4.6,ratingCount:470,
+ ingredients:["Goat meat or catfish","Calabash nutmeg (ehuru)","Uziza seeds","Scent leaf","Scotch bonnet pepper","Onion"],
+ steps:[["Boil the meat","Cook meat with onion and pepper until tender."],["Season","Add ground calabash nutmeg and uziza."],["Finish","Stir in scent leaf just before serving."]]},
+
+{id:17,name:"Amala",tribe:"Yoruba",states:["Oyo","Ogun","Lagos"],meal:"Lunch",confidence:"verified",img:"amala,yam-flour-swallow",
+ desc:"A dark, smooth swallow made from yam flour, usually eaten with ewedu and gbegiri.",
+ glossary:"A Yoruba staple, especially strongly associated with Oyo State, typically served as a three-part combo with ewedu and gbegiri soups.",
+ prep:"15 mins",difficulty:"Easy",servings:2,rating:4.6,ratingCount:520,
+ ingredients:["Yam flour (elubo)","Hot water"],
+ steps:[["Boil water","Bring water to a rolling boil."],["Mix in the flour","Gradually stir in yam flour, kneading until smooth and stretchy."]]},
+
+{id:18,name:"Ewedu Soup",tribe:"Yoruba",states:["Oyo","Lagos"],meal:"Lunch",confidence:"verified",img:"ewedu-soup,jute-leaf",
+ desc:"A light, slightly draw soup made from jute leaves, traditionally paired with amala and gbegiri.",
+ glossary:"Part of the classic Yoruba \"combo\" plate, ewedu's silky texture balances amala's density.",
+ prep:"15 mins",difficulty:"Easy",servings:3,rating:4.5,ratingCount:230,
+ ingredients:["Jute leaves (ewedu)","Locust beans (iru)","Ground crayfish","Pepper"],
+ steps:[["Blend the leaves","Boil jute leaves briefly, then blend or grind until smooth."],["Season","Return to heat, add crayfish, iru and pepper, simmer briefly."]]},
+
+{id:19,name:"Gbegiri",tribe:"Yoruba",states:["Oyo"],meal:"Lunch",confidence:"verified",img:"gbegiri,bean-soup",
+ desc:"A smooth bean soup made from cooked, sieved beans, typically served alongside amala and ewedu.",
+ glossary:"Completes the classic Ibadan-style \"combo\" plate together with amala and ewedu.",
+ prep:"1 hr",difficulty:"Medium",servings:4,rating:4.5,ratingCount:190,
+ ingredients:["Peeled brown beans","Palm oil","Pepper","Onion","Seasoning"],
+ steps:[["Boil the beans","Cook beans until very soft."],["Sieve","Mash and sieve to remove the skins."],["Season","Return to heat with palm oil and pepper, simmer briefly."]]},
+
+{id:20,name:"Abacha (African Salad)",tribe:"Igbo",states:["Anambra","Enugu"],meal:"Lunch",confidence:"verified",img:"abacha,african-salad",
+ desc:"A delightful cuisine indigenous to the Igbo, made from shredded dried cassava tossed in a peppery, oil-based dressing.",
+ glossary:"Often called \"African Salad,\" abacha is served cold or at room temperature and can be prepared in minutes.",
+ prep:"20 mins",difficulty:"Easy",servings:3,rating:4.5,ratingCount:210,
+ ingredients:["Dried shredded cassava (abacha)","Ugba (oil bean)","Palm oil","Potash","Crayfish","Utazi leaves","Pepper"],
+ steps:[["Soak","Soak the shredded cassava in warm water until soft, then drain."],["Make the dressing","Mix palm oil with dissolved potash until it turns creamy yellow."],["Toss","Toss abacha with the dressing, ugba, crayfish, pepper and utazi."]]},
+
+{id:21,name:"Nsala Soup (White Soup)",tribe:"Igbo",states:["Imo","Abia"],meal:"Dinner",confidence:"verified",img:"nsala-soup,catfish",
+ desc:"A popular Nigerian soup — typically catfish based — cooked without palm oil, giving it a pale, peppery broth eaten with eba.",
+ glossary:"Also called \"white soup\" for its color, it's a comfort dish across the South East, often served for guests.",
+ prep:"45 mins",difficulty:"Medium",servings:4,rating:4.6,ratingCount:260,
+ ingredients:["Catfish","Fresh yam (as thickener)","Uziza seeds","Uda spice","Utazi leaves","Pepper","Crayfish"],
+ steps:[["Boil the yam","Cook yam pieces until soft enough to thicken the soup."],["Add the fish","Add catfish and simmer gently so it stays intact."],["Season","Stir in uziza, uda, crayfish and pepper, finish with utazi."]]},
+
+{id:22,name:"Porridge Yam",tribe:"Yoruba / Igbo",states:["Ekiti","Imo"],meal:"Lunch",confidence:"verified",img:"yam-porridge,palm-oil",
+ desc:"A popular food made with chopped yam, palm oil, crayfish and vegetables, cooked down into a hearty porridge.",
+ glossary:"A quick, everyday one-pot meal loved across the south, sometimes brightened with scent leaf or spinach.",
+ prep:"30 mins",difficulty:"Easy",servings:4,rating:4.5,ratingCount:300,
+ ingredients:["Yam, cubed","Palm oil","Crayfish","Pepper","Onion","Scent leaf or spinach"],
+ steps:[["Boil","Cook yam with pepper, onion and stock until soft."],["Add oil & crayfish","Stir in palm oil and crayfish, mash lightly."],["Finish","Add leafy greens just before serving."]]},
+
+{id:23,name:"Tuwo Shinkafa",tribe:"Hausa",states:["Kano","Sokoto"],meal:"Dinner",confidence:"verified",img:"tuwo-shinkafa,rice-swallow",
+ desc:"A smooth, dense swallow made from soft-cooked rice, traditionally served with miyan kuka or other Hausa soups.",
+ glossary:"A Hausa staple across the North West, tuwo shinkafa is milder and softer than yam-based swallows further south.",
+ prep:"30 mins",difficulty:"Easy",servings:4,rating:4.4,ratingCount:180,
+ ingredients:["Rice (soft-cooking variety)","Water"],
+ steps:[["Cook the rice","Boil rice with extra water until very soft and mushy."],["Pound smooth","Mash or pound until smooth and elastic."]]},
+
+{id:24,name:"Miyan Kuka",tribe:"Hausa",states:["Kano","Bauchi"],meal:"Dinner",confidence:"verified",img:"baobab-soup,hausa",
+ desc:"A savory Hausa soup made from powdered baobab leaves, traditionally eaten with tuwo shinkafa.",
+ glossary:"Named for \"kuka,\" the Hausa word for baobab, whose leaves are dried and ground into powder for this soup.",
+ prep:"40 mins",difficulty:"Medium",servings:4,rating:4.4,ratingCount:140,
+ ingredients:["Powdered baobab leaves (kuka)","Dried fish or meat","Palm oil or groundnut oil","Locust beans (daddawa)","Pepper"],
+ steps:[["Cook the meat","Simmer meat or dried fish in seasoned stock."],["Add kuka","Stir in the baobab powder, whisking to avoid lumps."],["Simmer","Cook until it thickens slightly, finish with daddawa and pepper."]]},
+
+{id:25,name:"Masa",tribe:"Hausa",states:["Kano","Jigawa"],meal:"Breakfast",confidence:"verified",img:"masa,rice-cakes",
+ desc:"Soft, fermented rice cakes, pan-fried until golden and slightly spongy — a Hausa breakfast favorite.",
+ glossary:"Often served with a spicy pepper sauce (kosai sauce) or a light soup, masa is popular across northern markets.",
+ prep:"6 hrs ferment + 20 mins",difficulty:"Medium",servings:6,rating:4.5,ratingCount:150,
+ ingredients:["Rice","Yeast or fermented starter","Sugar","Salt","Oil for frying"],
+ steps:[["Soak & blend","Soak rice, blend with a little cooked rice for texture."],["Ferment","Cover and leave to ferment for several hours."],["Fry","Pour into a masa pan and fry until golden on both sides."]]},
+
+{id:26,name:"Owo Soup",tribe:"Edo",states:["Edo"],meal:"Dinner",confidence:"verified",img:"nigerian-soup,palm-oil-soup",
+ desc:"A smooth, semi-liquid Edo soup made with palm oil and a blend of ground ingredients, often served with starch.",
+ glossary:"A Benin City signature dish, traditionally eaten during royal or ceremonial occasions.",
+ prep:"1 hr",difficulty:"Hard",servings:4,rating:4.5,ratingCount:95,
+ ingredients:["Palm oil","Ground crayfish","Assorted meat & fish","Uziza leaves","Pepper","Ground pepper thickener"],
+ steps:[["Build the base","Simmer palm oil with pepper and crayfish."],["Add proteins","Add meat and fish, simmer until tender."],["Finish","Stir in uziza leaves just before serving."]]},
+
+{id:27,name:"Bitterleaf Soup (Ofe Onugbu)",tribe:"Igbo",states:["Enugu","Anambra"],meal:"Dinner",confidence:"verified",img:"bitterleaf-soup,nigeria",
+ desc:"A traditional Igbo soup made with washed bitter leaf, cooked with cocoyam thickener and assorted meats.",
+ glossary:"Named for the bitter leaf (onugbu) at its core, well-washed to mellow its bitterness into a savory depth.",
+ prep:"1 hr",difficulty:"Medium",servings:5,rating:4.6,ratingCount:220,
+ ingredients:["Bitter leaf, washed","Cocoyam (as thickener)","Palm oil","Stockfish","Assorted meat","Crayfish"],
+ steps:[["Prep the leaves","Wash bitter leaf thoroughly to reduce bitterness."],["Cook the meat","Simmer meat and stockfish in palm oil."],["Thicken & combine","Add cocoyam paste, then bitter leaf, simmer until it draws slightly."]]},
+
+{id:28,name:"Ekpang Nkukwo",tribe:"Efik / Ibibio",states:["Akwa Ibom","Cross River"],meal:"Dinner",confidence:"verified",img:"nigerian-soup,cocoyam",
+ desc:"Grated cocoyam wrapped in cocoyam leaves and simmered in a rich palm oil, periwinkle and fish broth.",
+ glossary:"A labor-intensive, celebration-worthy dish from the Efik/Ibibio kitchen, prized for its layered texture.",
+ prep:"1.5 hrs",difficulty:"Hard",servings:5,rating:4.6,ratingCount:130,
+ ingredients:["Cocoyam, grated","Cocoyam leaves","Periwinkle","Palm oil","Stockfish","Crayfish","Pepper"],
+ steps:[["Wrap the cocoyam","Roll grated cocoyam inside cocoyam leaves."],["Simmer","Cook wraps gently in a palm oil and fish broth."],["Finish","Add periwinkle and crayfish, simmer until fully tender."]]},
+
+{id:29,name:"Isi Ewu",tribe:"Igbo",states:["Anambra","Imo"],meal:"Dinner",confidence:"verified",img:"goat-head,spicy-nigerian",
+ desc:"Spiced goat head, slow-cooked and finished in a thick palm oil and spice paste — a festive Igbo delicacy.",
+ glossary:"Often served at celebrations alongside Nkwobi, using a similar palm oil-and-potash paste technique.",
+ prep:"2 hrs",difficulty:"Hard",servings:4,rating:4.6,ratingCount:175,
+ ingredients:["Goat head","Palm oil","Potash","Ground crayfish","Utazi leaves","Pepper","Onion"],
+ steps:[["Cook the goat head","Boil until tender, then singe for a smoky finish."],["Whip the sauce","Whisk palm oil with potash into a thick paste."],["Combine","Toss the meat through the sauce with utazi and sliced onion."]]},
+
+{id:30,name:"Ikokore",tribe:"Yoruba (Ijebu)",states:["Ogun"],meal:"Lunch",confidence:"verified",img:"water-yam-porridge,nigeria",
+ desc:"A rustic water yam porridge from Ijebu, grated and cooked directly into a rich palm oil and fish sauce.",
+ glossary:"A specialty of the Ijebu Yoruba, sometimes called \"porridge water yam,\" beloved for its silky, stretchy texture.",
+ prep:"45 mins",difficulty:"Medium",servings:4,rating:4.4,ratingCount:85,
+ ingredients:["Water yam, grated","Palm oil","Smoked fish","Ground crayfish","Pepper","Onion","Locust beans"],
+ steps:[["Build the sauce","Cook a peppery palm oil and fish sauce."],["Add grated yam","Drop spoonfuls of grated water yam directly into the simmering sauce."],["Simmer","Cook until the yam pieces turn translucent and thicken the pot."]]},
+
+{id:31,name:"Kilishi",tribe:"Hausa",states:["Kano","Sokoto"],meal:"Dinner",confidence:"golden",img:"dried-spiced-meat",
+ desc:"A spiced, sun-dried meat jerky popular across the north — the exact traditional drying and spice-layering process hasn't been documented here yet.",
+ glossary:"A Hausa specialty often compared to biltong, traditionally dried in thin sheets under the sun.",
+ prep:null,difficulty:null,servings:null,rating:null,ratingCount:0,ingredients:[],steps:[]},
+
+{id:32,name:"Kunun Aya (Tigernut Milk)",tribe:"Hausa",states:["Kano"],meal:"Breakfast",confidence:"golden",img:"tigernut-drink,milk",
+ desc:"A chilled, naturally sweet tigernut drink popular across the north as a breakfast refreshment — full recipe not yet documented.",
+ glossary:"Made from blended tigernuts, dates and coconut, often enjoyed during Ramadan.",
+ prep:null,difficulty:null,servings:null,rating:null,ratingCount:0,ingredients:[],steps:[]},
+
+{id:33,name:"Robo",tribe:"Yoruba",states:["Oyo"],meal:"Breakfast",confidence:"golden",img:"roasted-melon-seed-cake",
+ desc:"A roasted melon-seed snack cake sold by Yoruba street vendors — full preparation steps not yet documented.",
+ glossary:"A traditional snack often paired with boiled corn.",
+ prep:null,difficulty:null,servings:null,rating:null,ratingCount:0,ingredients:[],steps:[]},
+
+{id:34,name:"Ojojo",tribe:"Ijaw",states:["Bayelsa","Delta"],meal:"Breakfast",confidence:"golden",img:"water-yam-fritters",
+ desc:"Spiced water yam fritters from the Niger Delta — process not yet documented on the platform.",
+ glossary:"A riverine breakfast favorite, similar in spirit to akara but made from grated water yam.",
+ prep:null,difficulty:null,servings:null,rating:null,ratingCount:0,ingredients:[],steps:[]},
+
+{id:35,name:"Awara",tribe:"Yoruba / Hausa",states:["Oyo","Kano"],meal:"Lunch",confidence:"golden",img:"nigerian-tofu",
+ desc:"Nigerian-style soy bean cake, similar to tofu — full recipe not yet documented on the platform.",
+ glossary:"A protein-rich snack sold widely in markets, often spiced and grilled.",
+ prep:null,difficulty:null,servings:null,rating:null,ratingCount:0,ingredients:[],steps:[]},
+
+{id:36,name:"Miyan Taushe",tribe:"Hausa",states:["Kano","Katsina"],meal:"Dinner",confidence:"golden",img:"pumpkin-soup,hausa",
+ desc:"A Hausa pumpkin soup often eaten with tuwo — full recipe not yet documented on the platform.",
+ glossary:"Made from fresh pumpkin, a staple across the north's farming communities.",
+ prep:null,difficulty:null,servings:null,rating:null,ratingCount:0,ingredients:[],steps:[]},
+];
+</script>
+<script>
+const BLOG_POSTS = [
+{id:1,title:"The woman who taught Lagos how to fry akara before sunrise",tag:"Portrait",author:"CulinaryOS Heritage Desk",img:"lagos,street-vendor,morning",
+ body:"Before the city wakes, the corner near the bus stop already smells of hot oil and blended beans. For over twenty years, one woman has fried akara at the same spot, her bowl of batter whisked by hand until it holds air like a soufflé.\n\nShe learned the trick from her mother, who learned it from hers — no measuring cups, just the sound the batter makes against the bowl. Regulars say hers tastes different, lighter, though she insists it's the same recipe everyone's grandmother used.\n\nStories like this are what the Ingest Wizard exists for: recipes that live in hands and memory long before they're ever written down."},
+
+{id:2,title:"Why Ofada rice never left Ogun State",tag:"Origin",author:"CulinaryOS Heritage Desk",img:"rice-farm,west-africa",
+ body:"Ofada rice takes its name from a small town in Ogun State, where the grain is still grown in a way that resists the polishing and processing common to commercial rice. It's shorter, stubbier, and famously stains the pot brown as it cooks.\n\nFor decades, it stayed a regional specialty — considered too rustic for the polished long-grain rice served at parties. That changed as Ofada rice and its fiery Ayamase stew became a badge of authenticity on Lagos menus.\n\nWhat hasn't changed is where it's grown: still Ogun, still by hand, still the way it always was."},
+
+{id:3,title:"A pot of Banga soup and the river it came from",tag:"Place",author:"CulinaryOS Heritage Desk",img:"niger-delta,river,palm-trees",
+ body:"Along the creeks of the Niger Delta, palm trees grow so thick they blur into the water. Banga soup is what the region does with what it has: palm fruit, boiled and pounded by hand into a rich orange extract, simmered with fresh fish pulled from the same rivers.\n\nIn Delta, Edo and Bayelsa, the soup varies house to house — some add beletete leaves, others prefer it without. What stays constant is the smell: smoky, nutty, unmistakably of the Delta.\n\nWe're building a record of these regional variations before they blur together the way the trees do."},
+
+{id:4,title:"Suya after dark: how a Hausa trade became a national ritual",tag:"Origin",author:"CulinaryOS Heritage Desk",img:"suya,grill,night-market",
+ body:"Suya began with Hausa cattle traders moving herds across the north, grilling skewered beef over open fire at the end of long trading routes. The peanut-based yaji spice was practical — it preserved the meat and traveled well.\n\nToday, suya spots open at dusk in nearly every Nigerian city, regardless of tribe or region. The spice blend has traveled just as far as the trade routes that birthed it.\n\nWe're documenting yaji recipes state by state — no two suya spots season it quite the same way."},
+
+{id:5,title:"The three-part plate: Amala, ewedu and gbegiri",tag:"Origin",author:"CulinaryOS Heritage Desk",img:"nigerian-food,market,ibadan",
+ body:"In Ibadan, ordering amala means ordering three things at once. The dark yam-flour swallow arrives with a green ewedu soup and a smooth brown gbegiri, spooned in careful layers around the plate.\n\nEach part has its own texture, its own cooking method, its own family arguments about the right consistency. Together, they form one of Yoruba cuisine's most recognizable combinations.\n\nWe're cataloguing this as three separate dishes on the platform — because each deserves its own process, even when they always arrive on the same plate."},
+
+{id:6,title:"What Nkwobi looks like at an Igbo wedding",tag:"Culture",author:"CulinaryOS Heritage Desk",img:"nigerian-wedding,celebration",
+ body:"At most Igbo celebrations, Nkwobi arrives before the main meal — a shared wooden bowl of spiced cow foot, passed around as guests mingle and greet.\n\nThe dish is as much social ritual as it is food: eaten with fingers, shared from one bowl, meant to be lingered over. Getting the palm oil paste right — thick, glossy, not too heavy — is a point of quiet pride for whoever's cooking.\n\nDishes like this remind us heritage preservation isn't just about the recipe. It's about the moment around the table."},
+
+{id:7,title:"The baobab tree that feeds a soup",tag:"Ingredient",author:"CulinaryOS Heritage Desk",img:"baobab-tree,savanna,africa",
+ body:"Across the northern savanna, baobab trees stand wide and ancient, their leaves dried and ground into a fine green powder called kuka. That powder becomes Miyan Kuka — a soup found across Kano and Bauchi kitchens.\n\nThe baobab itself can live over a thousand years, and the practice of drying its leaves for soup has likely lasted almost as long. It's a reminder that some Nigerian recipes are inseparable from the specific trees and land they grow from.\n\nWe want every dish on this platform to carry that context, not just its ingredient list."},
+
+{id:8,title:"Pepper soup, cooked for someone who's unwell",tag:"Culture",author:"CulinaryOS Heritage Desk",img:"pepper-soup,bowl,steam",
+ body:"There's a specific kind of care that shows up as a bowl of pepper soup — light, fiery, brought to someone recovering from a cold or a long week. It's less a recipe than a gesture.\n\nThe calabash nutmeg and uziza seeds that give it its signature warmth are said to help clear the sinuses, though most people who cook it aren't thinking about the science. They're just doing what was done for them.\n\nFood like this is hard to separate from the people who make it — which is exactly why we're building a place to keep both."},
+
+{id:9,title:"Inside a Calabar kitchen making Afang soup",tag:"Portrait",author:"CulinaryOS Heritage Desk",img:"calabar,kitchen,cooking",
+ body:"Shredding afang leaves finely enough is a skill that takes years to get right — too thick and the soup turns stringy, too fine and it loses its bite. In Calabar, this knowledge passes from mother to daughter over shared kitchen counters.\n\nAfang is often confused with Edikang Ikong outside the South South, but locals are quick to correct you: different leaf, different texture, different soul.\n\nGetting details like this right — leaf by leaf — is the whole point of building this archive with real contributors, not guesses."},
+
+{id:10,title:"Why Jollof rice starts arguments at every party",tag:"Culture",author:"CulinaryOS Heritage Desk",img:"jollof-rice,party,celebration",
+ body:"Ask three Nigerians for the \"correct\" Jollof recipe and expect three confident, conflicting answers. Smoky bottom or none? Bay leaf or no bay leaf? Party jollof cooked over firewood, or nothing counts?\n\nThe rivalry even extends beyond Nigeria's borders — a decades-long, mostly good-natured feud with Ghana over whose Jollof reigns supreme.\n\nWe're not here to settle the argument. We're here to make sure every regional version gets documented before it gets flattened into one \"standard\" recipe online."},
+
+{id:11,title:"The cassava that becomes Abacha in an afternoon",tag:"Origin",author:"CulinaryOS Heritage Desk",img:"cassava,farm,nigeria",
+ body:"Abacha starts as cassava, boiled, sliced and dried into thin strips — a process that can take a full day before it ever reaches a plate. Once shredded, though, the salad itself comes together in minutes.\n\nIn Anambra and Enugu, it's a dish for gathering — sold at roadside stalls, tossed fresh, eaten standing up with friends. The palm oil and potash dressing is where every cook's signature shows.\n\nA dish that's both an all-day process and a five-minute salad, depending on which half you're doing — that duality is worth preserving accurately."},
+
+{id:12,title:"A grandmother's Moi Moi wrap, and why she still uses leaves",tag:"Portrait",author:"CulinaryOS Heritage Desk",img:"banana-leaves,cooking,traditional",
+ body:"Foil is faster, but she still wraps her Moi Moi in banana leaves — she says it changes the smell as it steams, something foil can't replicate. Her grandchildren tease her about it and eat two servings anyway.\n\nSmall preferences like this rarely make it into written recipes, but they're often the difference between a dish that tastes like home and one that just tastes correct.\n\nWe want contributors to note details like this — not just the ingredient list, but the small stubborn choices that carry flavor and memory both."},
+
+{id:13,title:"The bitter leaf that isn't actually bitter, if you wash it right",tag:"Ingredient",author:"CulinaryOS Heritage Desk",img:"green-vegetables,leaves,market",
+ body:"Bitter leaf earns its name honestly — until it's washed. Done right, repeated rinsing pulls out most of the bitterness, leaving behind a deep, savory green that anchors Ofe Onugbu.\n\nHow many washes is \"enough\" is a matter of fierce personal opinion in Enugu and Anambra kitchens. Too few, and the soup turns sharp. Too many, and you lose the leaf's character entirely.\n\nIt's exactly the kind of judgment call that's hard to teach from a written recipe alone — better learned, and preserved, from people who've done it for years."},
+
+{id:14,title:"Kano's masa vendors and the rice that ferments overnight",tag:"Place",author:"CulinaryOS Heritage Desk",img:"kano,market,street-food",
+ body:"Masa needs patience most modern kitchens don't budget for — rice soaked, blended and left to ferment for hours before it ever touches a pan. In Kano's markets, vendors start the process the night before, timing it so the batter's ready with the morning crowd.\n\nThe result is a soft, faintly sour rice cake, pan-fried until the edges crisp — a texture no shortcut quite replicates.\n\nDocumenting a dish like this means documenting the waiting, not just the frying."},
+
+{id:15,title:"What a wooden bowl of Isi Ewu says about hospitality",tag:"Culture",author:"CulinaryOS Heritage Desk",img:"nigerian-feast,gathering",
+ body:"Isi Ewu doesn't show up at ordinary weekday meals. It's a dish for guests, for celebration, for the moment a host wants to say: this occasion matters.\n\nThe slow-cooked goat head, finished in a thick palm oil and potash paste, takes hours of attention — time that itself becomes part of the hospitality being offered.\n\nAs we build out FoodMap, dishes like this remind us that \"popularity\" and \"everyday\" aren't the same thing — some recipes are precious precisely because they're rare."},
+
+{id:16,title:"The Ijebu porridge that cooks the yam raw, in the pot",tag:"Origin",author:"CulinaryOS Heritage Desk",img:"nigerian-porridge,cooking-pot",
+ body:"Most yam dishes boil the yam first, then build the sauce around it. Ikokore does the opposite — grated raw water yam is dropped straight into a simmering palm oil and fish sauce, cooking as it thickens the pot.\n\nThe technique is specific to Ijebu Yoruba kitchens in Ogun State, and it produces a texture unlike any other yam dish on this platform — silky, stretchy, almost glossy.\n\nSmall technical choices like \"cook it in, not before\" are exactly the kind of detail that gets lost when recipes travel far from where they started."},
+
+{id:17,title:"Tracing Egusi soup across three regions, one bowl at a time",tag:"Origin",author:"CulinaryOS Heritage Desk",img:"egusi,melon-seeds,soup",
+ body:"Egusi might be Nigeria's most-cooked soup, and also its most varied. In Lagos, it often leans toward spinach. In parts of the South East, bitter leaf makes an appearance alongside it. Some households fry the egusi into lumps; others blend it smooth.\n\nAsk for \"the\" egusi recipe and you'll get a dozen answers, each correct for the kitchen it came from.\n\nRather than picking one version as canonical, we're aiming to hold space for several — tagged by region, credited to the people who shared them."},
+
+{id:18,title:"A Benin City kitchen and the soup that predates written recipes",tag:"Portrait",author:"CulinaryOS Heritage Desk",img:"benin-city,traditional-cooking",
+ body:"Owo soup rarely appears in cookbooks outside Edo State, passed down mostly through direct instruction — watch, taste, adjust, repeat. Its smooth, semi-liquid texture takes practice to get right.\n\nAssociated historically with royal and ceremonial cooking in Benin City, it's the kind of dish that risks disappearing quietly if nobody writes it down.\n\nThat's the exact gap this platform exists to close — not replacing the people who know these dishes, but giving their knowledge somewhere permanent to live."},
+
+{id:19,title:"The peanut spice blend that has no fixed recipe",tag:"Ingredient",author:"CulinaryOS Heritage Desk",img:"spices,market,nigeria",
+ body:"Yaji, the spice blend behind suya, is less a recipe than a philosophy — roasted ground peanuts, ginger, garlic, cayenne, in ratios every seller keeps close to their chest.\n\nSome blends lean sweeter, others punishing hot. Regulars often follow a specific suya spot for years, loyal to one person's exact hand with the spice tin.\n\nWe're not trying to standardize yaji into one \"correct\" blend — we're trying to capture that it was never meant to be standardized at all."},
+
+{id:20,title:"Why Ekpang Nkukwo takes an entire afternoon",tag:"Culture",author:"CulinaryOS Heritage Desk",img:"cocoyam,leaves,traditional-food",
+ body:"Grating the cocoyam, wrapping it carefully in cocoyam leaves, simmering it slowly in a rich broth — Ekpang Nkukwo doesn't move fast, and nobody who makes it expects it to.\n\nIn Akwa Ibom and Cross River households, it's often a dish made together, several hands wrapping while one tends the pot.\n\nWe think dishes like this deserve process screens that reflect their real pace — not rushed for convenience, but honest about the time they actually take."},
+
+{id:21,title:"The Ijaw fritter that rarely leaves the Delta",tag:"Place",author:"CulinaryOS Heritage Desk",img:"niger-delta,fishing-village",
+ body:"Ojojo — spiced, grated water yam fritters — is a familiar breakfast across Bayelsa and Delta's riverine communities, but stays largely unknown outside the region.\n\nIt shares a family resemblance with akara, but the water yam gives it a denser, earthier bite. Right now, it's tagged Golden on our platform — a name we know, a process we're still gathering.\n\nIf you know how it's really made, this is exactly the kind of dish we'd love a contributor to complete."},
+
+{id:22,title:"One okazi leaf, two different soups",tag:"Ingredient",author:"CulinaryOS Heritage Desk",img:"west-african-vegetables,market",
+ body:"Okazi leaves — also called afang — show up in kitchens across the South South and South East, but rarely in quite the same soup. In Cross River and Akwa Ibom, they anchor Afang soup itself. Elsewhere, they season other pots as a background note.\n\nThe leaf's bitterness has to be balanced carefully, usually against waterleaf's mildness, or the whole pot tips too sharp.\n\nTracking one ingredient across multiple dishes and regions is exactly the kind of connection a proper food archive should be able to hold."},
+
+{id:23,title:"What 'starch and Banga' means on a Delta afternoon",tag:"Place",author:"CulinaryOS Heritage Desk",img:"starch,swallow,nigerian-food",
+ body:"Ask for lunch in parts of Delta and Bayelsa and you might get \"starch\" — a stretchy, translucent swallow made from cassava starch — served with Banga soup on the side, the pairing so common it's said almost as one word.\n\nThe starch itself takes a particular hand: too little heat and it won't set, too much and it turns rubbery.\n\nPairings like this — where two dishes are almost never separated — are worth recording together, not just as isolated recipes."},
+
+{id:24,title:"Building this archive one submission at a time",tag:"Platform",author:"CulinaryOS Team",img:"cooking,hands,community",
+ body:"Every dish on this platform started the same way every dish in this article did — someone who knew it, took the time to write it down. Some are fully documented. Some, tagged Golden, are still waiting on the details.\n\nThat's by design. We'd rather show you an honest, growing archive than a polished but shallow one.\n\nIf there's a dish from your family, your tribe, or your state that you don't see here yet — or see incompletely — the Ingest Wizard is open. This archive is only as complete as the people who help build it."},
+];
+</script>
+<script>
+// ============================================================
+// APP STATE & CORE NAV
+// ============================================================
+let currentView = 'discover';
+let currentMealFilter = 'All';
+let currentTribeFilter = null;
+let tribeRowOpen = false;
+let currentProcessDish = null;
+let currentStateSelected = null;
+let stopwatchInterval = null;
+let stopwatchSeconds = 0;
+let currentProcessRating = 0;
+let composeImageData = null;
+let ingestStep = 1;
+let ingestData = { image:null, video:null, ingredients:[], steps:[] };
+
+function imgUrl(query, w=600, h=400){
+  return `https://picsum.photos/seed/${hashStr(query)}/${w}/${h}`;
+}
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;} return h%5000; }
+
+// Real Nigerian food photography, pooled by category (Wikimedia Commons, CC-BY-SA).
+// Category match, not exact-dish match, per instruction — soup image for soup dishes, rice for rice, etc.
+const WIKI_BASE = 'https://commons.wikimedia.org/wiki/Special:FilePath/';
+const IMAGE_POOLS = {
+  rice: ['Party Nigerian jollof rice.jpg','A Nigeria Jollof Rice with chicken.jpg','A well-garnished Jollof Rice.jpg','Jollof rice with vegetable.jpg','African Fried Rice with Fried Plantain and Beef.jpg'],
+  soup: ['African dish,,Egusi Soup and Eba.jpg','Eba and Egusi soup.JPG','Pounded Yam and Egusi Soup.jpg','Afang soup and pounded yam 06.jpg','Afia Efere.jpg'],
+  swallow: ['A Plate of Pounded Yam (Iyan) served in Birmingham UK.JPG','Pounded Yam and Egusi Soup.jpg','Afang soup and pounded yam 06.jpg'],
+  snack: ['Akara.jpg','Akara na Akamu (Fried Bean cakes and Pap).jpg','Akara and kwunu breakfast (beans cake and pap).jpg'],
+  protein: ['African-nigeria stew.jpg','African delicacy.jpg','African meal.jpg'],
+  drink: ['Akara and kwunu breakfast (beans cake and pap).jpg'],
+  generic: ['African delicacies.jpg','African meal.jpg']
+};
+function categorizeDish(imgKeyword){
+  const k = imgKeyword.toLowerCase();
+  if(k.includes('swallow')) return 'swallow';
+  if(k.includes('porridge') || k.includes('soup')) return 'soup';
+  if(k.includes('cake') || k.includes('fritters') || k.includes('melon-seed') || k.includes('puff') || k.includes('roasted') || k.includes('tofu') || k.includes('bean') || k.includes('salad')) return 'snack';
+  if(k.includes('meat') || k.includes('goat') || k.includes('cow-foot') || k.includes('grilled')) return 'protein';
+  if(k.includes('drink') || k.includes('milk')) return 'drink';
+  if(k.includes('rice')) return 'rice';
+  return 'generic';
+}
+function dishImgUrl(dish, w=600){
+  const category = categorizeDish(dish.img);
+  const pool = IMAGE_POOLS[category] || IMAGE_POOLS.generic;
+  const file = pool[dish.id % pool.length];
+  return `${WIKI_BASE}${encodeURIComponent(file)}?width=${w}`;
+}
+
+// Real Nigerian heritage/culture photography for states (Wikimedia Commons, CC-BY-SA).
+// Specific overrides where a state-exact photo is confirmed; zone-pooled elsewhere for honest, still-real coverage.
+const STATE_IMAGE_OVERRIDE = {
+  'Bauchi': 'Zaar (Jarawa) dancers from Bauchi State.jpg',
+  'Osun': 'Visitors at the Osun Osogbo Festival.jpg',
+  'FCT': 'Hausa Festival - Beaded Mosaic - Cyprian Ekwensi Cultural Center - FCT Abuja - Nigeria.jpg',
+  'Edo': 'Bini Group.jpg',
+  'Cross River': 'Calabar Group 2.jpg',
+  'Lagos': 'Brazilian Group.jpg',
+};
+const ZONE_IMAGE_POOLS = {
+  'South West': ['African Group.jpg','Beauty Pageants 3.jpg','Beauty Pegeants.jpg'],
+  'South South': ['Bini Group 2.jpg','Calabar Group 2.jpg','Beauty Pageants 4.jpg'],
+  'South East': ['African Group.jpg','Beauty Pegeants 2.jpg'],
+  'North West': ['Hausa traditional horse outfit.jpg','Hausa warrior outfit for durba.jpg'],
+  'North East': ['Zaar (Jarawa) dancers from Bauchi State.jpg','Hausa traditional horse outfit.jpg'],
+  'North Central': ['Hausa Festival - Beaded Mosaic - Cyprian Ekwensi Cultural Center - FCT Abuja - Nigeria.jpg','African Group.jpg'],
+};
+function stateImgUrl(state, w=700){
+  const file = STATE_IMAGE_OVERRIDE[state.name] || ZONE_IMAGE_POOLS[state.zone][state.name.length % ZONE_IMAGE_POOLS[state.zone].length];
+  return `${WIKI_BASE}${encodeURIComponent(file)}?width=${w}`;
+}
+
+function goTo(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target = document.getElementById('view-'+view);
+  if(target) target.classList.add('active');
+  currentView = view;
+  closeDrawer();
+  window.scrollTo({top:0,behavior:'instant'});
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.dataset.nav === view){ b.classList.add('text-leaf-600'); b.classList.remove('text-ink-400'); }
+    else { b.classList.remove('text-leaf-600'); b.classList.add('text-ink-400'); }
+  });
+  if(view==='discover') renderDiscoverGrid();
+  if(view==='foodmap') renderStatesGrid();
+  if(view==='blog') renderBlogGrid();
+  if(view==='profile') renderProfile();
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('translate-y-20','opacity-0');
+  setTimeout(()=>{ t.classList.add('translate-y-20','opacity-0'); }, 2200);
+}
+
+// ============================================================
+// DRAWER
+// ============================================================
+function openDrawer(){
+  document.getElementById('drawer').classList.remove('closed');
+  document.getElementById('drawer-scrim').classList.remove('opacity-0','pointer-events-none');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.add('closed');
+  document.getElementById('drawer-scrim').classList.add('opacity-0','pointer-events-none');
+}
+function toggleContactDropdown(){
+  const d = document.getElementById('contact-dropdown');
+  const c = document.getElementById('contact-chevron');
+  if(d){ d.classList.toggle('hidden'); c.textContent = d.classList.contains('hidden') ? 'expand_more' : 'expand_less'; }
+  const dd = document.getElementById('contact-dropdown-desktop');
+  const cd = document.getElementById('contact-chevron-desktop');
+  if(dd){ dd.classList.toggle('hidden'); cd.textContent = dd.classList.contains('hidden') ? 'expand_more' : 'expand_less'; }
+}
+
+// ============================================================
+// DISCOVER
+// ============================================================
+function setMealFilter(f){
+  currentMealFilter = f;
+  document.querySelectorAll('#discover-filters .chip').forEach(c=>c.classList.remove('active'));
+  const btn = document.querySelector(`#discover-filters [data-filter="${f}"]`);
+  if(btn && f!=='Tribes') btn.classList.add('active');
+  if(f !== 'Tribes'){ currentTribeFilter = null; document.getElementById('tribe-filter-row').classList.add('hidden'); tribeRowOpen=false; }
+  renderDiscoverGrid();
+}
+function toggleTribeRow(){
+  tribeRowOpen = !tribeRowOpen;
+  const row = document.getElementById('tribe-filter-row');
+  if(tribeRowOpen){
+    const tribes = [...new Set(DISHES.map(d=>d.tribe))];
+    row.innerHTML = tribes.map(t=>`<button onclick="setTribeFilter('${t.replace(/'/g,"\\'")}')" class="chip whitespace-nowrap px-3 py-1.5 rounded-full text-[11px] font-bold border border-ink-100 bg-white text-ink-600">${t}</button>`).join('');
+    row.classList.remove('hidden');
+    row.classList.add('flex');
+  } else {
+    row.classList.add('hidden');
+  }
+}
+function setTribeFilter(t){
+  currentTribeFilter = t;
+  currentMealFilter = 'All';
+  document.querySelectorAll('#discover-filters .chip').forEach(c=>c.classList.remove('active'));
+  renderDiscoverGrid();
+}
+function renderDiscoverGrid(){
+  const grid = document.getElementById('discover-grid');
+  const search = (document.getElementById('discover-search')?.value || '').toLowerCase();
+  let list = DISHES.filter(d=>{
+    let ok = true;
+    if(currentMealFilter !== 'All') ok = ok && d.meal === currentMealFilter;
+    if(currentTribeFilter) ok = ok && d.tribe === currentTribeFilter;
+    if(search) ok = ok && (d.name.toLowerCase().includes(search) || d.tribe.toLowerCase().includes(search) || d.states.join(' ').toLowerCase().includes(search));
+    return ok;
+  });
+  document.getElementById('discover-empty').classList.toggle('hidden', list.length>0);
+  grid.innerHTML = list.map(dishCardHTML).join('');
+}
+function dishCardHTML(d){
+  const golden = d.confidence === 'golden';
+  return `
+  <button onclick="openProcess(${d.id})" class="dish-card text-left bg-white rounded-2xl overflow-hidden shadow-card ${golden?'golden-ring':''}">
+    <div class="relative h-28">
+      <img src="${dishImgUrl(d)}" onerror="this.onerror=null;this.src='${imgUrl(d.img)}'" class="w-full h-full object-cover" loading="lazy">
+      ${golden ? `<div class="absolute top-1.5 right-1.5 bg-gold-400 text-gold-800 text-[9px] font-extrabold px-2 py-0.5 rounded-full">NEEDS RECIPE</div>` : ''}
+    </div>
+    <div class="p-2.5">
+      <p class="font-display font-bold text-sm text-ink-800 leading-tight truncate">${d.name}</p>
+      <p class="text-[10px] text-ink-400 font-semibold mt-0.5">${d.tribe}</p>
+      ${d.rating ? `<div class="flex items-center gap-1 mt-1">
+        <span class="material-icons text-gold-500 text-sm">star</span>
+        <span class="text-[11px] font-bold text-ink-600">${d.rating}</span>
+        <span class="text-[10px] text-ink-300">(${d.ratingCount})</span>
+      </div>` : `<p class="text-[10px] text-gold-600 font-bold mt-1">Help complete this</p>`}
+    </div>
+  </button>`;
+}
+
+// ============================================================
+// FOODMAP
+// ============================================================
+function renderStatesGrid(){
+  const grid = document.getElementById('states-grid');
+  grid.innerHTML = STATES.map(s=>`
+    <button onclick="openState('${s.name}')" class="state-card text-left bg-white rounded-2xl overflow-hidden shadow-card">
+      <div class="relative h-28">
+        <img src="${stateImgUrl(s)}" onerror="this.onerror=null;this.src='${imgUrl(s.img)}'" class="w-full h-full object-cover" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+        <p class="absolute bottom-1.5 left-2 text-white font-display font-bold text-sm">${s.name}</p>
+      </div>
+      <div class="px-2.5 py-2">
+        <p class="text-[10px] text-ink-400 font-semibold">${s.capital} · ${s.zone}</p>
+        <p class="text-[10px] text-ink-500 mt-0.5 line-clamp-2">${s.bio}</p>
+      </div>
+    </button>`).join('');
+}
+function openState(name){
+  currentStateSelected = name;
+  const s = STATES.find(x=>x.name===name);
+  document.getElementById('state-detail-header').innerHTML = `
+    <img src="${stateImgUrl(s,900)}" onerror="this.onerror=null;this.src='${imgUrl(s.img)}'" class="w-full h-full object-cover">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+    <div class="absolute bottom-3 left-4 right-4">
+      <p class="text-white font-display font-bold text-2xl">${s.name}</p>
+      <p class="text-white/80 text-xs font-semibold">${s.capital} · ${s.tribes.join(' & ')}</p>
+    </div>`;
+  const bioBox = document.getElementById('state-detail-bio');
+  if(bioBox) bioBox.textContent = s.bio;
+  const dishes = DISHES.filter(d=>d.states.includes(name));
+  const grid = document.getElementById('state-detail-grid');
+  grid.innerHTML = dishes.length ? dishes.map(dishCardHTML).join('') :
+    `<p class="col-span-2 text-center text-sm text-ink-400 py-10">No documented dishes for ${name} yet — be the first to <button onclick="goTo('ingest')" class="text-leaf-600 font-bold underline">add one</button>.</p>`;
+  goTo('state-detail');
+}
+
+// ============================================================
+// PROCESS SCREEN
+// ============================================================
+let processReturnView = 'discover';
+function openProcess(id){
+  const d = DISHES.find(x=>x.id===id);
+  if(currentView !== 'process') processReturnView = (currentView === 'state-detail') ? 'state-detail' : (currentView === 'discover' ? 'discover' : 'foodmap');
+  currentProcessDish = d;
+  currentProcessRating = 0;
+  stopwatchSeconds = 0;
+  clearInterval(stopwatchInterval);
+  document.getElementById('stopwatch-display').textContent = '00:00';
+  document.getElementById('stopwatch-btn').innerHTML = '<span class="material-icons text-lg">play_circle</span>';
+
+  document.getElementById('process-image').src = dishImgUrl(d, 900);
+  window.__processImgFallback = imgUrl(d.img, 800, 600);
+  document.getElementById('process-title').textContent = d.name;
+  document.getElementById('process-meta').textContent = `${d.tribe} · ${d.states.join(', ')}`;
+  document.getElementById('process-desc').textContent = d.desc;
+  document.getElementById('process-glossary').textContent = d.glossary;
+  document.getElementById('process-golden-badge').classList.toggle('hidden', d.confidence!=='golden');
+
+  const isGolden = d.confidence === 'golden';
+  document.getElementById('process-golden-cta').classList.toggle('hidden', !isGolden);
+  document.getElementById('process-full-detail').classList.toggle('hidden', isGolden);
+
+  if(!isGolden){
+    document.getElementById('process-preptime').textContent = d.prep;
+    document.getElementById('process-difficulty').textContent = d.difficulty;
+    document.getElementById('process-servings').textContent = d.servings;
+    document.getElementById('process-ingredients').innerHTML = d.ingredients.map(i=>`<li class="flex items-start gap-2"><span class="text-leaf-500 mt-1">•</span>${i}</li>`).join('');
+    document.getElementById('process-steps').innerHTML = d.steps.map((s,i)=>`
+      <li class="flex gap-3">
+        <div class="w-7 h-7 rounded-full bg-leaf-100 text-leaf-700 font-display font-bold text-xs flex items-center justify-center shrink-0">${i+1}</div>
+        <div><p class="font-bold text-sm text-ink-700">${s[0]}</p><p class="text-xs text-ink-500 mt-0.5">${s[1]}</p></div>
+      </li>`).join('');
+    renderProcessStars(d.rating);
+    document.getElementById('process-rating-count').textContent = `${d.ratingCount} people have rated this dish`;
+  }
+  goTo('process');
+}
+function closeProcess(){
+  clearInterval(stopwatchInterval);
+  goTo(processReturnView);
+}
+function goToIngestFromGolden(){
+  showToast(`Starting a submission for ${currentProcessDish?.name || 'this dish'}`);
+  goTo('ingest');
+}
+function renderProcessStars(avg){
+  const wrap = document.getElementById('process-rating-stars');
+  wrap.innerHTML = '';
+  for(let i=1;i<=5;i++){
+    const filled = i <= Math.round(avg);
+    wrap.innerHTML += `<button onclick="rateProcess(${i})" class="text-2xl ${filled?'text-gold-500':'text-ink-200'}" id="star-${i}"><span class="material-icons">star</span></button>`;
+  }
+}
+function rateProcess(i){
+  currentProcessRating = i;
+  document.querySelectorAll('#process-rating-stars button').forEach((b,idx)=>{
+    b.classList.toggle('text-gold-500', idx < i);
+    b.classList.toggle('text-ink-200', idx >= i);
+  });
+  showToast('Thank you for your feedback!');
+}
+function toggleStopwatch(){
+  const btn = document.getElementById('stopwatch-btn');
+  if(stopwatchInterval){
+    clearInterval(stopwatchInterval);
+    stopwatchInterval = null;
+    btn.innerHTML = '<span class="material-icons text-lg">play_circle</span>';
+  } else {
+    stopwatchInterval = setInterval(()=>{
+      stopwatchSeconds++;
+      const m = String(Math.floor(stopwatchSeconds/60)).padStart(2,'0');
+      const s = String(stopwatchSeconds%60).padStart(2,'0');
+      document.getElementById('stopwatch-display').textContent = `${m}:${s}`;
+    },1000);
+    btn.innerHTML = '<span class="material-icons text-lg">pause_circle</span>';
+  }
+}
+</script>
+<script>
+// ============================================================
+// INGEST WIZARD
+// ============================================================
+function handleIngestImage(input){
+  if(input.files[0]){
+    ingestData.image = input.files[0].name;
+    document.getElementById('ingest-image-filename').textContent = '✓ ' + input.files[0].name;
+  }
+}
+function handleIngestVideo(input){
+  if(input.files[0]){
+    ingestData.video = input.files[0].name;
+    document.getElementById('ingest-video-filename').textContent = '✓ ' + input.files[0].name;
+  }
+}
+function addIngestIngredient(){
+  const input = document.getElementById('ingest-ingredient-input');
+  if(input.value.trim()){
+    ingestData.ingredients.push(input.value.trim());
+    input.value='';
+    renderIngestIngredients();
+  }
+}
+function addSuggestedIngredient(name){
+  ingestData.ingredients.push(name);
+  renderIngestIngredients();
+}
+function renderIngestIngredients(){
+  document.getElementById('ingest-ingredient-list').innerHTML = ingestData.ingredients.map((ing,i)=>`
+    <div class="flex items-center justify-between bg-ink-50 rounded-lg px-3 py-2 text-sm">
+      <span>${ing}</span>
+      <button onclick="removeIngestIngredient(${i})" class="text-ink-300"><span class="material-icons text-base">close</span></button>
+    </div>`).join('');
+}
+function removeIngestIngredient(i){ ingestData.ingredients.splice(i,1); renderIngestIngredients(); }
+
+function addIngestStep(){
+  const input = document.getElementById('ingest-step-input');
+  if(input.value.trim()){
+    ingestData.steps.push(input.value.trim());
+    input.value='';
+    renderIngestSteps();
+  }
+}
+function renderIngestSteps(){
+  document.getElementById('ingest-steps-list').innerHTML = ingestData.steps.map((s,i)=>`
+    <div class="flex items-start justify-between bg-ink-50 rounded-lg px-3 py-2 text-sm gap-2">
+      <span><span class="font-bold text-leaf-600">${i+1}.</span> ${s}</span>
+      <button onclick="removeIngestStep(${i})" class="text-ink-300 shrink-0"><span class="material-icons text-base">close</span></button>
+    </div>`).join('');
+}
+function removeIngestStep(i){ ingestData.steps.splice(i,1); renderIngestSteps(); }
+
+function ingestNext(){
+  if(ingestStep===1 && !ingestData.image){ showToast('A photo is required to continue'); return; }
+  if(ingestStep===2 && ingestData.ingredients.length===0){ showToast('Add at least one ingredient'); return; }
+  if(ingestStep===3 && ingestData.steps.length===0){ showToast('Add at least one step'); return; }
+  if(ingestStep===4){ return; } // handled by confirm button
+  ingestStep++;
+  showIngestStep();
+}
+function ingestBack(){
+  ingestStep--;
+  showIngestStep();
+}
+function showIngestStep(){
+  document.querySelectorAll('.ingest-step').forEach(el=>el.classList.add('hidden'));
+  document.querySelector(`.ingest-step[data-step="${ingestStep}"]`).classList.remove('hidden');
+  document.querySelectorAll('#ingest-progress > div').forEach(el=>{
+    el.classList.toggle('bg-leaf-600', parseInt(el.dataset.step) <= ingestStep);
+    el.classList.toggle('bg-ink-100', parseInt(el.dataset.step) > ingestStep);
+  });
+  document.getElementById('ingest-back-btn').classList.toggle('hidden', ingestStep===1 || ingestStep===5);
+  document.getElementById('ingest-nav').classList.toggle('hidden', ingestStep===4 || ingestStep===5);
+  if(ingestStep===4){
+    document.getElementById('review-image').textContent = ingestData.image || '—';
+    document.getElementById('review-ingredients').textContent = ingestData.ingredients.join(', ') || '—';
+    document.getElementById('review-steps').textContent = ingestData.steps.map((s,i)=>`${i+1}) ${s}`).join('  ') || '—';
+  }
+}
+function confirmIngest(){
+  ingestStep = 5;
+  showIngestStep();
+}
+function resetIngest(){
+  ingestStep = 1;
+  ingestData = { image:null, video:null, ingredients:[], steps:[] };
+  document.getElementById('ingest-image-filename').textContent='';
+  document.getElementById('ingest-video-filename').textContent='';
+  renderIngestIngredients();
+  renderIngestSteps();
+  showIngestStep();
+}
+</script>
+<script>
+// ============================================================
+// BLOG
+// ============================================================
+let userPosts = [];
+function renderBlogGrid(){
+  const all = [...userPosts, ...BLOG_POSTS];
+  const grid = document.getElementById('blog-grid');
+  grid.innerHTML = all.map(p=>`
+    <button onclick="openBlogPost(${p.id}, ${userPosts.includes(p)})" class="w-full text-left bg-white rounded-2xl overflow-hidden shadow-card flex gap-3">
+      <img src="${imgUrl(p.img,200,200)}" class="w-24 h-24 object-cover shrink-0">
+      <div class="py-2.5 pr-3 flex-1 min-w-0">
+        <p class="text-[10px] font-bold text-clay-500 uppercase tracking-widest">${p.tag}</p>
+        <p class="font-display font-bold text-sm text-ink-800 leading-tight mt-0.5 line-clamp-2">${p.title}</p>
+        <p class="text-[10px] text-ink-400 mt-1">${p.author}</p>
+      </div>
+    </button>`).join('');
+}
+function openBlogPost(id, isUser){
+  const p = isUser ? userPosts.find(x=>x.id===id) : BLOG_POSTS.find(x=>x.id===id);
+  document.getElementById('blog-post-image').src = imgUrl(p.img,800,600);
+  document.getElementById('blog-post-tag').textContent = p.tag;
+  document.getElementById('blog-post-title').textContent = p.title;
+  document.getElementById('blog-post-author').textContent = 'By ' + p.author;
+  document.getElementById('blog-post-body').textContent = p.body;
+  goTo('blog-post');
+}
+
+// Compose modal
+function openCompose(){
+  document.getElementById('compose-scrim').classList.remove('hidden');
+  document.getElementById('compose-sheet').classList.remove('closed');
+  document.getElementById('compose-form').classList.remove('hidden');
+  document.getElementById('compose-preview').classList.add('hidden');
+}
+function closeCompose(){
+  document.getElementById('compose-scrim').classList.add('hidden');
+  document.getElementById('compose-sheet').classList.add('closed');
+}
+function updateWordCount(){
+  const words = document.getElementById('compose-body').value.trim().split(/\s+/).filter(Boolean).length;
+  const el = document.getElementById('compose-wordcount');
+  el.textContent = `${words} / 250 words`;
+  el.classList.toggle('text-leaf-600', words>=250);
+  el.classList.toggle('text-ink-400', words<250);
+}
+function handleComposeImage(input){
+  if(input.files[0]){
+    composeImageData = input.files[0].name;
+    document.getElementById('compose-image-filename').textContent = '✓ ' + input.files[0].name;
+  }
+}
+function previewCompose(){
+  const title = document.getElementById('compose-title').value.trim();
+  const body = document.getElementById('compose-body').value.trim();
+  const words = body.split(/\s+/).filter(Boolean).length;
+  if(!title){ showToast('Give your story a title'); return; }
+  if(words < 250){ showToast(`Needs at least 250 words (currently ${words})`); return; }
+  document.getElementById('compose-preview-title').textContent = title;
+  document.getElementById('compose-preview-body').textContent = body;
+  document.getElementById('compose-preview-img').src = imgUrl(composeImageData || 'nigerian,food,story', 400, 200);
+  document.getElementById('compose-form').classList.add('hidden');
+  document.getElementById('compose-preview').classList.remove('hidden');
+}
+function backToComposeForm(){
+  document.getElementById('compose-form').classList.remove('hidden');
+  document.getElementById('compose-preview').classList.add('hidden');
+}
+function publishCompose(){
+  closeCompose();
+  showToast('Sent for review — live within 24 hours');
+  document.getElementById('compose-title').value='';
+  document.getElementById('compose-body').value='';
+  updateWordCount();
+}
+</script>
+<script>
+// ============================================================
+// PRICING / UPGRADE GATE
+// ============================================================
+function showUpgradeGate(){ document.getElementById('upgrade-gate').classList.remove('hidden'); }
+function closeUpgradeGate(){ document.getElementById('upgrade-gate').classList.add('hidden'); }
+
+// ============================================================
+// DEV SANDBOX + SIMULATION (same gate pattern)
+// ============================================================
+function showGateContactPopup(feature){
+  document.getElementById('gate-contact-popup-text').textContent =
+    `${feature} is locked while we build V3. Contact us for early-access and payment-plan details.`;
+  document.getElementById('gate-contact-popup').classList.remove('hidden');
+}
+function closeGateContactPopup(){
+  document.getElementById('gate-contact-popup').classList.add('hidden');
+}
+
+// ============================================================
+// PROFILE (minimal placeholder)
+// ============================================================
+function renderProfile(){
+  document.getElementById('view-profile').innerHTML = `
+    <div class="text-center pt-8 pb-4">
+      <div class="w-20 h-20 rounded-full bg-leaf-100 mx-auto flex items-center justify-center">
+        <span class="material-icons text-leaf-600 text-4xl">person</span>
+      </div>
+      <p class="font-display font-bold text-xl mt-3 text-ink-800">Welcome, contributor</p>
+      <p class="text-xs text-ink-400 mt-1">Sign-in isn't connected yet — this is a preview of what your profile will hold.</p>
+    </div>
+    <div class="space-y-2 px-2">
+      <div class="bg-white border border-ink-100 rounded-2xl p-4 flex items-center justify-between">
+        <span class="text-sm font-semibold text-ink-600">Dishes contributed</span><span class="font-display font-bold text-leaf-600">0</span>
+      </div>
+      <div class="bg-white border border-ink-100 rounded-2xl p-4 flex items-center justify-between">
+        <span class="text-sm font-semibold text-ink-600">Stories published</span><span class="font-display font-bold text-clay-500">0</span>
+      </div>
+      <div class="bg-white border border-ink-100 rounded-2xl p-4 flex items-center justify-between">
+        <span class="text-sm font-semibold text-ink-600">Current plan</span><span class="font-display font-bold text-ink-800">Community</span>
+      </div>
+      <button onclick="showProGate()" class="w-full bg-white border border-gold-200 rounded-2xl p-4 flex items-center justify-between text-left">
+        <span>
+          <span class="text-sm font-semibold text-ink-600 block">Link social &amp; website</span>
+          <span class="text-[11px] text-ink-400">Show your Instagram, X, or restaurant site on your posts</span>
+        </span>
+        <span class="bg-gold-400 text-gold-800 text-[10px] font-extrabold px-2 py-1 rounded-full shrink-0 ml-2">PRO</span>
+      </button>
+    </div>
+  `;
+}
+function showProGate(){
+  document.getElementById('gate-contact-popup-text').textContent =
+    "Payment infrastructure is currently under development. Contact the team to enable this, or keep exploring the library and contributing to the platform.";
+  document.getElementById('gate-contact-popup').classList.remove('hidden');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function setTheme(mode){
+  document.documentElement.classList.toggle('dark', mode === 'dark');
+  try{ localStorage.setItem('culinaryos-theme', mode); }catch(e){}
+  document.querySelectorAll('[data-theme-btn]').forEach(b=>b.classList.toggle('active', b.dataset.themeBtn===mode));
+  document.querySelectorAll('[data-theme-btn-d]').forEach(b=>b.classList.toggle('active', b.dataset.themeBtnD===mode));
+}
+function initTheme(){
+  let saved = 'light';
+  try{ saved = localStorage.getItem('culinaryos-theme') || 'light'; }catch(e){}
+  setTheme(saved);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderDiscoverGrid();
+  renderIngestIngredients();
+  renderIngestSteps();
+  initTheme();
+  goTo('foodmap');
+});
+</script>
+</body>
+</html>
