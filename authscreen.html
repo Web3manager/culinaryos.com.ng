@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CulinaryOS - Login</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#10b981', // Emerald Core Accent
+                            600: '#059669',
+                        },
+                        dark: {
+                            950: '#060913',
+                            900: '#0b0f19',
+                            800: '#151b2d',
+                            700: '#1e2640',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #060913;
+        }
+        .glow-radial {
+            background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, rgba(6, 9, 19, 0) 70%);
+        }
+        .auth-card {
+            box-shadow: 0 0 50px -12px rgba(16, 185, 129, 0.08);
+        }
+        /* Hide HTML blocks initially based on state machine switching */
+        .state-hidden { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen antialiased flex items-center justify-center p-4 relative overflow-hidden">
+
+    <!-- Backdrops -->
+    <div class="absolute inset-0 glow-radial pointer-events-none z-0"></div>
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <main class="w-full max-w-md bg-dark-900 border border-dark-800 rounded-2xl p-8 auth-card relative z-10 space-y-6">
+        
+        <!-- Platform Branding Branding -->
+        <div class="flex flex-col items-center text-center space-y-2">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/10">
+                <span class="material-icons text-white text-xl font-bold">restaurant_menu</span>
+            </div>
+            <h1 class="text-xl font-bold text-white tracking-tight">Culinary<span class="text-brand-500">OS</span></h1>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: LOGIN CARD VIEW                    -->
+        <!-- ========================================== -->
+        <div id="view-login" class="space-y-5">
+            <div class="space-y-1 text-center">
+                <h2 class="text-lg font-bold text-white">Welcome back</h2>
+                <p class="text-xs text-gray-400">View and Access food recipies&uploads </p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-mono uppercase tracking-wider text-gray-400 font-medium">Login Email</label>
+                    <input type="email" required placeholder="Edikan-emeka@gmail.com" class="w-full bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+                
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[11px] font-mono uppercase tracking-wider text-gray-400 font-medium">Password</label>
+                        <a href="#" class="text-[11px] text-brand-500 hover:underline">Forgot?</a>
+                    </div>
+                    <input type="password" required placeholder="••••••••" class="w-full bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-dark-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-brand-600/10 flex items-center justify-center gap-2">
+                    Sign In to Dashboard <span class="material-icons text-sm font-bold">arrow_forward</span>
+                </button>
+            </form>
+
+            <div class="text-center pt-2">
+                <p class="text-xs text-gray-400">New to the Family? <button onclick="switchViewState('signup')" class="text-brand-500 font-semibold hover:underline bg-transparent border-none cursor-pointer">Create an account</button></p>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: SIGNUP CARD VIEW                   -->
+        <!-- ========================================== -->
+        <div id="view-signup" class="space-y-5 state-hidden">
+            <div class="space-y-1 text-center">
+                <h2 class="text-lg font-bold text-white">Create Account</h2>
+                <p class="text-xs text-gray-400">Upload and Access your food heritage in seconds</p>
+            </div>
+
+            <form onsubmit="handleSignupSubmit(event)" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-mono uppercase tracking-wider text-gray-400 font-medium">Full Name</label>
+                    <input type="text" required placeholder="Mike, Amaka, Helene, etc " class="w-full bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-mono uppercase tracking-wider text-gray-400 font-medium">Email Address</label>
+                    <input type="email" required placeholder="MikeAdewale5@gmail.com" class="w-full bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+                
+                <div class="space-y-1.5">
+                    <label class="text-[11px] font-mono uppercase tracking-wider text-gray-400 font-medium">Secured Password</label>
+                    <input type="password" required placeholder="Minimum 8 characters" class="w-full bg-dark-950 border border-dark-700 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+
+                <div class="flex items-start gap-2.5 pt-1">
+                    <input type="checkbox" required id="terms" class="mt-0.5 accent-brand-500 rounded bg-dark-950 border-dark-700">
+                    <label for="terms" class="text-[11px] text-gray-400 leading-normal">I agree to terms and conditions.</label>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-dark-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-brand-600/10 flex items-center justify-center gap-2">
+                    Generate OTP <span class="material-icons text-sm font-bold">vpn_key</span>
+                </button>
+            </form>
+
+            <div class="text-center pt-2">
+                <p class="text-xs text-gray-400">Already registered? <button onclick="switchViewState('login')" class="text-brand-500 font-semibold hover:underline bg-transparent border-none cursor-pointer">Sign in instead</button></p>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: O.T.P. VERIFICATION SCREEN         -->
+        <!-- ========================================== -->
+        <div id="view-otp" class="space-y-5 state-hidden">
+            <div class="space-y-1 text-center">
+                <div class="w-12 h-12 rounded-full bg-brand-500/10 flex items-center justify-center text-brand-500 mx-auto mb-2">
+                    <span class="material-icons">lock_person</span>
+                </div>
+                <h2 class="text-lg font-bold text-white">Security Verification</h2>
+                <p class="text-xs text-gray-400">Enter the 4-digit code " 0802 " displayed for faster verification </p>
+            </div>
+
+            <form onsubmit="handleOtpSubmit(event)" class="space-y-6">
+                <!-- 4 Digit Pin Input Field Layout Matrix -->
+                <div class="flex justify-center gap-4">
+                    <input type="text" maxlength="1" required class="otp-field w-14 h-14 bg-dark-950 border border-dark-700 rounded-xl text-center text-xl font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+                    <input type="text" maxlength="1" required class="otp-field w-14 h-14 bg-dark-950 border border-dark-700 rounded-xl text-center text-xl font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+                    <input type="text" maxlength="1" required class="otp-field w-14 h-14 bg-dark-950 border border-dark-700 rounded-xl text-center text-xl font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+                    <input type="text" maxlength="1" required class="otp-field w-14 h-14 bg-dark-950 border border-dark-700 rounded-xl text-center text-xl font-mono font-bold text-white focus:outline-none focus:border-brand-500">
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-dark-950 font-bold text-sm rounded-xl transition-all shadow-md shadow-brand-600/10 flex items-center justify-center gap-2">
+                    Open Dashboard <span class="material-icons text-sm font-bold">verified</span>
+                </button>
+            </form>
+
+            <div class="text-center pt-2 space-y-2">
+                <p class="text-xs text-gray-400">Didn't fetch the token? <button class="text-brand-500 font-semibold hover:underline bg-transparent border-none">Resend Code</button></p>
+                <button onclick="switchViewState('signup')" class="text-[11px] text-gray-500 hover:text-white block mx-auto flex items-center gap-1"><span class="material-icons text-xs">arrow_back</span> Return to registration</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- UI STATE ENGINE MACHINE CONTROLLER JAVASCRIPT LAYER -->
+    <script>
+        // Setup direct path parameters mapping to your target platform interface file location
+        const REDIRECT_DASHBOARD_TARGET = "dashboard.html";
+
+        function switchViewState(targetState) {
+            // Locate all container elements
+            const loginCard = document.getElementById("view-login");
+            const signupCard = document.getElementById("view-signup");
+            const otpCard = document.getElementById("view-otp");
+
+            // Hide everything by default configuration parameters
+            loginCard.classList.add("state-hidden");
+            signupCard.classList.add("state-hidden");
+            otpCard.classList.add("state-hidden");
+
+            // Re-render based on user routing targets
+            if (targetState === 'login') {
+                loginCard.classList.remove("state-hidden");
+            } else if (targetState === 'signup') {
+                signupCard.classList.remove("state-hidden");
+            } else if (targetState === 'otp') {
+                otpCard.classList.remove("state-hidden");
+                initializeOtpAutoTabLogic();
+            }
+        }
+
+        // FLOW 1: Login Submission Action (Direct Path)
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            console.log("Authentication state authorized. Routing directly to application matrix...");
+            window.location.href = REDIRECT_DASHBOARD_TARGET;
+        }
+
+        // FLOW 2: Signup Submission Action (Intercept with OTP validation)
+        function handleSignupSubmit(event) {
+            event.preventDefault();
+            console.log("Tenant data validated. Dispatching secure token handshake to client node...");
+            switchViewState('otp');
+        }
+
+         // FLOW 3: OTP Verification Action (Finalizes to Platform Dashboard)
+        function handleOtpSubmit(event) {
+            event.preventDefault();
+            console.log("Token handshake accepted successfully. Provisioning complete workspace...");
+            window.location.href = REDIRECT_DASHBOARD_TARGET;
+        }
+
+        // UX Helper: Automatically hops focus parameters to next block inside OTP array inputs
+        function initializeOtpAutoTabLogic() {
+            const inputs = document.querySelectorAll('.otp-field');
+            inputs.forEach((input, index) => {
+                // Focus the initialization input on start
+                if(index === 0) input.focus();
+
+                input.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>
